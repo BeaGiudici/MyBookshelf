@@ -9,8 +9,11 @@ async def test1():
   async with AsyncClient(app=app, base_url="http://test") as client:
     # crea
     resp = await client.post("/books/", \
-                             json={"title": "book1", "author": "Name Surname"})
+                             json={"title": "book1", \
+                                   "author": "Name Surname", \
+                                   "isbn" : "000-1-22-333333-4"})
     assert resp.status_code == 201
     book = resp.json()
     assert book["title"] == "book1"
     assert book["author"] == "Name Surname"
+    assert book['isbn'] == "000-1-22-333333-4"
