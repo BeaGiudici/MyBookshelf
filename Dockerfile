@@ -8,4 +8,4 @@ RUN pip install --no-cache-dir --upgrade -r /MyBookshelf/requirements.txt
 
 COPY ./app /MyBookshelf/app
 
-CMD ["fastapi", "run", "app/main.py", "--port", "80"]
+CMD ["fastapi", "run", "app/main.py", "--port", "8000"]
