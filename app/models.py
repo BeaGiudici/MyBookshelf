@@ -11,6 +11,7 @@ class Status(str, Enum):
 class BookCreate(BaseModel):
     title : str = Field(None, min_length=1)
     author : str = Field(None, min_length=1)
+    isbn : str = Field(None, min_length=1)
 
 # Update Book
 class BookUpdate(BaseModel):
@@ -18,7 +19,7 @@ class BookUpdate(BaseModel):
     author : Optional[str] = Field(None, min_length=1)
     genre : Optional[str]
     year : Optional[int]
-    isbn : Optional[str]
+    isbn : str
     type : Optional[str]
     status : Status
     description : Optional[str]
@@ -29,7 +30,7 @@ class Book(BaseModel):
     author : str
     genre : Optional[str]
     year : Optional[int]
-    isbn : Optional[str]
+    isbn : str
     type : Optional[str]
     status : Status
     description : Optional[str]
