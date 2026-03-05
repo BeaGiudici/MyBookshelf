@@ -1,5 +1,6 @@
 from typing import TYPE_CHECKING
-from . import Field, SQLModel, Relationship, Optional
+from . import Field, SQLModel, Relationship, Optional, List
+from .book_genre_link import BookGenreLink
 
 if TYPE_CHECKING:
     from .author import Author
@@ -13,8 +14,7 @@ class Book(SQLModel, table=True):
     isbn: str
     year: int
     author_id: int | None = Field(default=None, foreign_key="author.id")
-    genre_id: int | None = Field(default=None, foreign_key="genre.id")
     status_id: int | None = Field(default=None, foreign_key="status.id")
     author: Optional["Author"] = Relationship(back_populates="books")
-    genres: Optional["Genre"] = Relationship(back_populates="books")
+    genres: List["Genre"] = Relationship(back_populates="books", link_model=BookGenreLink)
     status: Optional["Status"] = Relationship(back_populates="books")
