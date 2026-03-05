@@ -5,6 +5,9 @@ from models.author import Author
 from models.genre import Genre
 from models.status import Status
 from faker import Faker
+import warnings
+
+warnings.filterwarnings("ignore")
 
 Faker.seed(42)
 fake = Faker()
