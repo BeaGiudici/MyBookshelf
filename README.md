@@ -59,3 +59,5 @@ Schematically, we have:
                                │ Genre Name               │
                                └──────────────────────────┘
 ```
+
+[![Mermaid view here](https://mermaid.ink/img/pako:eNp9kU1vwjAMQP9K5HOLSNs0TW4w0CZtKxIflymXbMmggiYopNK2wn9f2jIOO-CDJTvv2VLcwodVGjjEcSyMr_xBczS1dn9CM-nluzxpYfo3YbSbVXLrZC0MCjHZrJ8WyxU6n-PYtmi6WDyvEEcCMC8FDMxqPVlv7iND80oIeKnMHoXFBy3gP_o4L5fze2zJccdCBFtXKeDeNTqCWrtadiW03RwBfqfroHSGkm7fKZfgHKV5s7b-05xttjvgn_JwClVzVNLr6wfcEG2Udg-2MR44YayfAbyFL-AJzkaEZQlLx4yOCSloBN_AcWjjPCM0T1NKcsbwJYKffu14RIuMspzijBZJyEUEWlXeutfhRv2pLr8-zoB1?type=png)](https://mermaid.live/edit#pako:eNp9kU1vwjAMQP9K5HOLSNs0TW4w0CZtKxIflymXbMmggiYopNK2wn9f2jIOO-CDJTvv2VLcwodVGjjEcSyMr_xBczS1dn9CM-nluzxpYfo3YbSbVXLrZC0MCjHZrJ8WyxU6n-PYtmi6WDyvEEcCMC8FDMxqPVlv7iND80oIeKnMHoXFBy3gP_o4L5fze2zJccdCBFtXKeDeNTqCWrtadiW03RwBfqfroHSGkm7fKZfgHKV5s7b-05xttjvgn_JwClVzVNLr6wfcEG2Udg-2MR44YayfAbyFL-AJzkaEZQlLx4yOCSloBN_AcWjjPCM0T1NKcsbwJYKffu14RIuMspzijBZJyEUEWlXeutfhRv2pLr8-zoB1)
