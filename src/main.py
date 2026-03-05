@@ -2,7 +2,6 @@ from models.book import Book
 from models.author import Author
 
 import psycopg2
-from psycopg2.extensions import ISOLATION_LEVEL_AUTOCOMMIT
 from sqlmodel import SQLModel, create_engine
 from dotenv import load_dotenv
 import os
@@ -20,7 +19,7 @@ def create_database():
         dbname="postgres", user=DB_USER, password=DB_PASSWORD,
         host=DB_HOST, port=DB_PORT,
     )
-    conn.set_isolation_level(ISOLATION_LEVEL_AUTOCOMMIT)
+    conn.autocommit = True
     cursor = conn.cursor()
     cursor.execute(f"SELECT 1 FROM pg_database WHERE datname = '{DB_NAME}'")
     if not cursor.fetchone():
@@ -40,7 +39,7 @@ def delete_database():
         dbname="postgres", user=DB_USER, password=DB_PASSWORD,
         host=DB_HOST, port=DB_PORT,
     )
-    conn.set_isolation_level(ISOLATION_LEVEL_AUTOCOMMIT)
+    conn.autocommit = True
     cursor = conn.cursor()
     cursor.execute(f"""
         SELECT pg_terminate_backend(pg_stat_activity.pid)
@@ -54,13 +53,17 @@ def delete_database():
 
 
 if __name__ == "__main__":
-    import sys
+    import argparse
+    parser = argparse.ArgumentParser()
+    parser.add_argument("--reset", action="store_true", help="Reset the database")
+    parser.add_argument("--debug", action="store_true", default=False, help="Show debug information")
+    args = parser.parse_args()
 
-    if "--reset" in sys.argv:
+    if args.reset:
         delete_database()
 
     create_database()
     db_url = f"postgresql://{DB_USER}:{DB_PASSWORD}@{DB_HOST}:{DB_PORT}/{DB_NAME}"
-    engine = create_engine(db_url, echo=True)
+    engine = create_engine(db_url, echo=args.debug)
     create_tables(engine)
     print(f"Database '{DB_NAME}' ready.")
