@@ -5,6 +5,7 @@ description = "Build a book database"
 readme = "README.md"
 requires-python = ">=3.12"
 dependencies = [
+    "faker>=40.8.0",
     "fastapi[standard]>=0.135.1",
     "httpx>=0.28.1",
     "psycopg2-binary>=2.9.11",
