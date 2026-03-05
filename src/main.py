@@ -1,9 +1,66 @@
 from models.book import Book
 from models.author import Author
 
+import psycopg2
+from psycopg2.extensions import ISOLATION_LEVEL_AUTOCOMMIT
 from sqlmodel import SQLModel, create_engine
+from dotenv import load_dotenv
+import os
 
-db_url = "postgresql://postgres:postgres@localhost:5432/bookshelf"
-engine = create_engine(db_url, echo=True)
+load_dotenv()
 
-SQLModel.metadata.create_all(engine)
+DB_NAME = os.getenv("DB_NAME")
+DB_USER = os.getenv("DB_USER")
+DB_PASSWORD = os.getenv("DB_PASSWORD")
+DB_HOST = os.getenv("DB_HOST")
+DB_PORT = os.getenv("DB_PORT")
+
+def create_database():
+    conn = psycopg2.connect(
+        dbname="postgres", user=DB_USER, password=DB_PASSWORD,
+        host=DB_HOST, port=DB_PORT,
+    )
+    conn.set_isolation_level(ISOLATION_LEVEL_AUTOCOMMIT)
+    cursor = conn.cursor()
+    cursor.execute(f"SELECT 1 FROM pg_database WHERE datname = '{DB_NAME}'")
+    if not cursor.fetchone():
+        cursor.execute(f"CREATE DATABASE {DB_NAME}")
+        print(f"Database '{DB_NAME}' created.")
+    else:
+        print(f"Database '{DB_NAME}' already exists.")
+    cursor.close()
+    conn.close()
+
+
+def create_tables(engine):
+    SQLModel.metadata.create_all(engine)
+
+def delete_database():
+    conn = psycopg2.connect(
+        dbname="postgres", user=DB_USER, password=DB_PASSWORD,
+        host=DB_HOST, port=DB_PORT,
+    )
+    conn.set_isolation_level(ISOLATION_LEVEL_AUTOCOMMIT)
+    cursor = conn.cursor()
+    cursor.execute(f"""
+        SELECT pg_terminate_backend(pg_stat_activity.pid)
+        FROM pg_stat_activity
+        WHERE pg_stat_activity.datname = '{DB_NAME}' AND pid <> pg_backend_pid()
+    """)
+    cursor.execute(f"DROP DATABASE IF EXISTS {DB_NAME}")
+    print(f"Database '{DB_NAME}' deleted.")
+    cursor.close()
+    conn.close()
+
+
+if __name__ == "__main__":
+    import sys
+
+    if "--reset" in sys.argv:
+        delete_database()
+
+    create_database()
+    db_url = f"postgresql://{DB_USER}:{DB_PASSWORD}@{DB_HOST}:{DB_PORT}/{DB_NAME}"
+    engine = create_engine(db_url, echo=True)
+    create_tables(engine)
+    print(f"Database '{DB_NAME}' ready.")
