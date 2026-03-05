@@ -1,1 +1,6 @@
 sqlmodel
+fastapi[standard]
+pydantic
+typing
+httpx
+pytest
