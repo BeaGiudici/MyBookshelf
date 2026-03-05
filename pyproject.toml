@@ -1,0 +1,14 @@
+[project]
+name = "my-bookshelf"
+version = "0.1.0"
+description = "Build a book database"
+readme = "README.md"
+requires-python = ">=3.12"
+dependencies = [
+    "fastapi[standard]>=0.135.1",
+    "httpx>=0.28.1",
+    "pydantic>=2.12.5",
+    "pytest>=9.0.2",
+    "sqlmodel>=0.0.37",
+    "typing>=3.10.0.0",
+]
