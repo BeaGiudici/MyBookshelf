@@ -4,3 +4,4 @@ pydantic
 typing
 httpx
 pytest
+psycopg2-binary
