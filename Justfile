@@ -27,3 +27,27 @@ reset-database:
 [group("fake-entries")]
 populate-fake:
     @uv run src/utils/fake_entries.py
+
+# API
+[group("api")]
+run-api:
+    @uv run uvicorn src.main:app --reload --host 0.0.0.0 --port 8000
+
+# -------------------------
+# Code quality
+# -------------------------
+
+# Lint code with ruff (auto-fix enabled)
+[group("code-quality")]
+lint:
+    @uv run ruff check . --fix
+
+# Format code with ruff formatter
+[group("code-quality")]
+format:
+    @uv run ruff format .
+
+# Type check (default target: src/)
+[group("code-quality")]
+type-check target=".":
+    @uvx typing check {{target}}
