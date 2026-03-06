@@ -16,14 +16,14 @@ setup:
 # Database creation
 [group("database")]
 create-database:
-    @uv run src/main.py
+    @uv run src/schemas/db.py
 
 # Database reset
 [group("database")]
 reset-database:
-    @uv run src/main.py --reset
+    @uv run src/schemas/db.py
 
 # Fake entries creation
 [group("fake-entries")]
 populate-fake:
-    @uv run src/fake_entries.py
+    @uv run src/utils/fake_entries.py

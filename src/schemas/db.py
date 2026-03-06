@@ -1,5 +1,7 @@
-from models.book import Book
-from models.author import Author
+from src.schemas.book import Book
+from src.schemas.author import Author
+from src.schemas.genre import Genre
+from src.schemas.status import Status
 
 import psycopg2
 from sqlmodel import SQLModel, create_engine

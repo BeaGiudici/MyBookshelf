@@ -1,9 +1,9 @@
 # Create fake entries for the database
 
-from models.book import Book
-from models.author import Author
-from models.genre import Genre
-from models.status import Status
+from src.schemas.book import Book
+from src.schemas.author import Author
+from src.schemas.genre import Genre
+from src.schemas.status import Status
 from faker import Faker
 import warnings
 
@@ -13,7 +13,7 @@ Faker.seed(42)
 fake = Faker()
 
 # Fixed sets for lookup tables
-genres = ["Fiction", "Non-Fiction", "Science Fiction", "Fantasy", "Mystery", "Biography", "History"]
+genres = ["Fiction", "Non-Fiction", "Science Fiction", "Fantasy", "Mystery", "Biography", "History", "Horror", "Thriller", "Romance", "Young Adult", "Children", "Adventure", "Dystopian", "Graphic Novel","Memoir", "Poetry", "Self-Help", "Suspense", "Travel"]
 statuses = ["TBR", "Reading", "Read"]
 
 # Create genres, statuses, then authors, then books linking them together
