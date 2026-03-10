@@ -2,3 +2,4 @@
 .venv
 bookshelf.db
 __pycache__/
+.ruff_cache/
