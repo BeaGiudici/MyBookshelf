@@ -1,4 +1,3 @@
-
 import psycopg2
 from sqlmodel import SQLModel, create_engine
 from dotenv import load_dotenv
@@ -13,10 +12,14 @@ DB_HOST = os.getenv("DB_HOST")
 DB_PORT = os.getenv("DB_PORT")
 DB_URL = os.getenv("DB_URL")
 
+
 def create_database():
     conn = psycopg2.connect(
-        dbname="postgres", user=DB_USER, password=DB_PASSWORD,
-        host=DB_HOST, port=DB_PORT,
+        dbname="postgres",
+        user=DB_USER,
+        password=DB_PASSWORD,
+        host=DB_HOST,
+        port=DB_PORT,
     )
     conn.autocommit = True
     cursor = conn.cursor()
@@ -33,10 +36,14 @@ def create_database():
 def create_tables(engine):
     SQLModel.metadata.create_all(engine)
 
+
 def delete_database():
     conn = psycopg2.connect(
-        dbname="postgres", user=DB_USER, password=DB_PASSWORD,
-        host=DB_HOST, port=DB_PORT,
+        dbname="postgres",
+        user=DB_USER,
+        password=DB_PASSWORD,
+        host=DB_HOST,
+        port=DB_PORT,
     )
     conn.autocommit = True
     cursor = conn.cursor()
@@ -53,9 +60,12 @@ def delete_database():
 
 if __name__ == "__main__":
     import argparse
+
     parser = argparse.ArgumentParser()
     parser.add_argument("--reset", action="store_true", help="Reset the database")
-    parser.add_argument("--debug", action="store_true", default=False, help="Show debug information")
+    parser.add_argument(
+        "--debug", action="store_true", default=False, help="Show debug information"
+    )
     args = parser.parse_args()
 
     if args.reset:

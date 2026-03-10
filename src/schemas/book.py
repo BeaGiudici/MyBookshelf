@@ -16,5 +16,7 @@ class Book(SQLModel, table=True):
     author_id: int | None = Field(default=None, foreign_key="author.id")
     status_id: int | None = Field(default=None, foreign_key="status.id")
     author: Optional["Author"] = Relationship(back_populates="books")
-    genres: List["Genre"] = Relationship(back_populates="books", link_model=BookGenreLink)
+    genres: List["Genre"] = Relationship(
+        back_populates="books", link_model=BookGenreLink
+    )
     status: Optional["Status"] = Relationship(back_populates="books")

@@ -9,4 +9,6 @@ if TYPE_CHECKING:
 class Genre(SQLModel, table=True):
     id: int | None = Field(default=None, primary_key=True, index=True)
     name: str
-    books: List["Book"] = Relationship(back_populates="genres", link_model=BookGenreLink)
+    books: List["Book"] = Relationship(
+        back_populates="genres", link_model=BookGenreLink
+    )
