@@ -29,35 +29,41 @@ The database will collect the books in my bookshelf and is made by these tables:
 
 Schematically, we have:
 
-```
-┌──────────────────────┐       ┌──────────────────────────┐       ┌─────────────────┐
-│       Authors        │       │          Books           │       │     Status      │
-├──────────────────────┤       ├──────────────────────────┤       ├─────────────────┤
-│ Author ID (PK)       │──1:N─>│ Book ID (PK)             │<─1:N──│ Status ID (PK)  │
-│ Name                 │       │ Title                    │       │ Status          │
-│ Date of Birth        │       │ ISBN                     │       └─────────────────┘
-│ Date of Death        │       │ Year                     │
-│ Country              │       │ Author ID (FK)           │
-└──────────────────────┘       │ Status ID (FK)           │
-                               └────────────┬─────────────┘
-                                            │
-                                           1:N
-                                            │
-                               ┌────────────┴─────────────┐
-                               │       Book_Genres        │
-                               ├──────────────────────────┤
-                               │ Book ID (FK)             │
-                               │ Genre ID (FK)            │
-                               └────────────┬─────────────┘
-                                            │
-                                           N:1
-                                            │
-                               ┌────────────┴─────────────┐
-                               │         Genres           │
-                               ├──────────────────────────┤
-                               │ Genre ID (PK)            │
-                               │ Genre Name               │
-                               └──────────────────────────┘
-```
+```mermaid
+---
+title: Books Database
+---
 
-[![Mermaid view here](https://mermaid.ink/img/pako:eNp9kU1vwjAMQP9K5HOLSNs0TW4w0CZtKxIflymXbMmggiYopNK2wn9f2jIOO-CDJTvv2VLcwodVGjjEcSyMr_xBczS1dn9CM-nluzxpYfo3YbSbVXLrZC0MCjHZrJ8WyxU6n-PYtmi6WDyvEEcCMC8FDMxqPVlv7iND80oIeKnMHoXFBy3gP_o4L5fze2zJccdCBFtXKeDeNTqCWrtadiW03RwBfqfroHSGkm7fKZfgHKV5s7b-05xttjvgn_JwClVzVNLr6wfcEG2Udg-2MR44YayfAbyFL-AJzkaEZQlLx4yOCSloBN_AcWjjPCM0T1NKcsbwJYKffu14RIuMspzijBZJyEUEWlXeutfhRv2pLr8-zoB1?type=png)](https://mermaid.live/edit#pako:eNp9kU1vwjAMQP9K5HOLSNs0TW4w0CZtKxIflymXbMmggiYopNK2wn9f2jIOO-CDJTvv2VLcwodVGjjEcSyMr_xBczS1dn9CM-nluzxpYfo3YbSbVXLrZC0MCjHZrJ8WyxU6n-PYtmi6WDyvEEcCMC8FDMxqPVlv7iND80oIeKnMHoXFBy3gP_o4L5fze2zJccdCBFtXKeDeNTqCWrtadiW03RwBfqfroHSGkm7fKZfgHKV5s7b-05xttjvgn_JwClVzVNLr6wfcEG2Udg-2MR44YayfAbyFL-AJzkaEZQlLx4yOCSloBN_AcWjjPCM0T1NKcsbwJYKffu14RIuMspzijBZJyEUEWlXeutfhRv2pLr8-zoB1)
+erDiagram
+    AUTHORS {
+        int author_id PK
+        string name
+        date date_of_birth
+        date date_of_death
+        string country
+    }
+    BOOKS {
+        int book_id PK
+        string title
+        string isbn
+        int year
+        int author_id FK
+        int status_id FK
+    }
+    STATUS {
+        int status_id PK
+        string status
+    }
+    GENRES {
+        int genre_id PK
+        string genre_name
+    }
+    BOOKGENRELINK {
+        int book_id FK
+        int genre_id FK
+    }
+    AUTHORS ||--o{ BOOKS : "1:N"
+    STATUS ||--o{ BOOKS : "1:N"
+    BOOKS ||--o{ BOOKGENRELINK : "1:N"
+    GENRES ||--o{ BOOKGENRELINK : "N:1"
+```
