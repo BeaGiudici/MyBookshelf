@@ -13,10 +13,32 @@ Faker.seed(42)
 fake = Faker()
 
 # Fixed sets for lookup tables
-genres = ["Fiction", "Non-Fiction", "Science Fiction", "Fantasy", "Mystery", "Biography", "History", "Horror", "Thriller", "Romance", "Young Adult", "Children", "Adventure", "Dystopian", "Graphic Novel","Memoir", "Poetry", "Self-Help", "Suspense", "Travel"]
+genres = [
+    "Fiction",
+    "Non-Fiction",
+    "Science Fiction",
+    "Fantasy",
+    "Mystery",
+    "Biography",
+    "History",
+    "Horror",
+    "Thriller",
+    "Romance",
+    "Young Adult",
+    "Children",
+    "Adventure",
+    "Dystopian",
+    "Graphic Novel",
+    "Memoir",
+    "Poetry",
+    "Self-Help",
+    "Suspense",
+    "Travel",
+]
 statuses = ["TBR", "Reading", "Read"]
 
 # Create genres, statuses, then authors, then books linking them together
+
 
 def create_fake_books(session):
     all_genres = session.query(Genre).all()
@@ -33,17 +55,19 @@ def create_fake_books(session):
         session.commit()
     print("Fake books created successfully")
 
+
 def create_fake_authors(session):
     for _ in range(5):
         author = Author(
             name=fake.name(),
             date_of_birth=fake.date_of_birth(),
-            #date_of_death=fake.date_of_birth(),
+            # date_of_death=fake.date_of_birth(),
             country=fake.country(),
         )
         session.add(author)
         session.commit()
     print("Fake authors created successfully")
+
 
 def create_fake_genres(session):
     for g in genres:
@@ -51,6 +75,7 @@ def create_fake_genres(session):
         session.add(genre)
         session.commit()
     print("Fake genres created successfully")
+
 
 def create_fake_statuses(session):
     for s in statuses:
@@ -66,6 +91,7 @@ def create_fake_entries(session):
     create_fake_authors(session)
     create_fake_books(session)
     print("Fake entries created successfully")
+
 
 if __name__ == "__main__":
     from sqlmodel import create_engine, Session
