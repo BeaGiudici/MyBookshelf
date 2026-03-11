@@ -14,7 +14,7 @@ async def get_book(book_id: int) -> BookResponse:
         if not book:
             raise HTTPException(status_code=404, detail="Book not found")
         author = (
-            AuthorInBookResponse(name=book.author.name)
+            AuthorInBookResponse(id=book.id, name=book.author.name)
             if book.author
             else None
         )

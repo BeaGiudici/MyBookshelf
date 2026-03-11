@@ -14,3 +14,15 @@ class Book(SQLModel, table=True):
         back_populates="books", link_model=BookGenreLink
     )
     status: Optional["Status"] = Relationship(back_populates="books")
+
+
+class AuthorInBookResponse(SQLModel):
+    """Author fields included when returning a book."""
+    name: str
+
+
+class BookResponse(SQLModel):
+    """Response schema linking book title and author."""
+    id: int
+    title: str
+    author: AuthorInBookResponse | None = None
