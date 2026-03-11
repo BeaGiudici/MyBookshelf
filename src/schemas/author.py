@@ -1,9 +1,5 @@
-from typing import TYPE_CHECKING
 from datetime import datetime
-from . import Field, SQLModel, Relationship, Optional, List
-
-if TYPE_CHECKING:
-    from .book import Book
+from .base import Field, SQLModel, Relationship, Optional, List
 
 
 class Author(SQLModel, table=True):

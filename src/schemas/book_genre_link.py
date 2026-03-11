@@ -1,4 +1,4 @@
-from . import Field, SQLModel
+from .base import Field, SQLModel
 
 
 class BookGenreLink(SQLModel, table=True):

@@ -1,8 +1,4 @@
-from typing import TYPE_CHECKING
-from . import Field, SQLModel, Relationship, List
-
-if TYPE_CHECKING:
-    from .book import Book
+from .base import Field, SQLModel, Relationship, List
 
 
 class Status(SQLModel, table=True):

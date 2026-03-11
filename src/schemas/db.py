@@ -34,6 +34,13 @@ def create_database():
 
 
 def create_tables(engine):
+    # Import models so they are registered on SQLModel.metadata
+    from src.schemas import author as _author  # noqa: F401
+    from src.schemas import book as _book  # noqa: F401
+    from src.schemas import book_genre_link as _book_genre_link  # noqa: F401
+    from src.schemas import genre as _genre  # noqa: F401
+    from src.schemas import status as _status  # noqa: F401
+
     SQLModel.metadata.create_all(engine)
 
 

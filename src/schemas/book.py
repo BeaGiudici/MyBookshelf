@@ -1,11 +1,5 @@
-from typing import TYPE_CHECKING
-from . import Field, SQLModel, Relationship, Optional, List
+from .base import Field, SQLModel, Relationship, Optional, List  
 from .book_genre_link import BookGenreLink
-
-if TYPE_CHECKING:
-    from .author import Author
-    from .genre import Genre
-    from .status import Status
 
 
 class Book(SQLModel, table=True):
