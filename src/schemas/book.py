@@ -1,6 +1,8 @@
 from .base import Field, SQLModel, Relationship, Optional, List  
 from .book_genre_link import BookGenreLink
-
+from .author import Author
+from .genre import Genre
+from .status import Status
 
 class Book(SQLModel, table=True):
     id: int | None = Field(default=None, primary_key=True, index=True)
@@ -15,6 +17,14 @@ class Book(SQLModel, table=True):
     )
     status: Optional["Status"] = Relationship(back_populates="books")
 
+class BookCreate(SQLModel):
+    """Request body for creating a book."""
+    title: str
+    isbn: str
+    year: int
+    author: Author
+    genres: List[Genre]
+    status: Status
 
 class AuthorInBookResponse(SQLModel):
     """Author fields included when returning a book."""

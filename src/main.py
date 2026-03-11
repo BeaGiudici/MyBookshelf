@@ -1,4 +1,8 @@
 from fastapi import FastAPI
+
+# Import all models so SQLAlchemy mappers (and relationships) are registered
+from src.schemas import Author, Book, BookGenreLink, Genre, Status  # noqa: F401
+
 from src.endpoints.book.create.add_book import router as add_book_router
 from src.endpoints.book.read.read_all import router as read_all_books_router
 from src.endpoints.book.read.read_book import router as read_book_router
