@@ -8,14 +8,14 @@ tags = ["book"]
 router = APIRouter(prefix=path, tags=tags)
 
 @router.put("/")
-async def update_book(book: Book) -> list[Book]:
+async def update_book(new_book: Book) -> Book:
     with get_session() as db:
-        existing_book = db.get(Book, book.id)
+        existing_book = db.get(Book, new_book.id)
         if not existing_book:
             raise HTTPException(status_code=404, detail="Book not found")
-        existing_book.title = book.title
-        existing_book.isbn = book.isbn
-        existing_book.year = book.year
+        existing_book.title = new_book.title
+        existing_book.isbn = new_book.isbn
+        existing_book.year = new_book.year
         db.commit()
         db.refresh(existing_book)
-    return sorted(db.query(Book).all(), key=lambda x: x.id)
+    return existing_book
