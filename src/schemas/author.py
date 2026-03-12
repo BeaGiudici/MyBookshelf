@@ -9,3 +9,10 @@ class Author(SQLModel, table=True):
     date_of_death: datetime = Field(default=datetime.now())
     country: str = Field(default="Unknown")
     books: List["Book"] = Relationship(back_populates="author")
+
+class AuthorUpdate(SQLModel):
+    id: int
+    name: Optional[str] = None
+    date_of_birth: Optional[datetime] = None
+    date_of_death: Optional[datetime] = None
+    country: Optional[str] = None

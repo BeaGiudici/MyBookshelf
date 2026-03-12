@@ -1,4 +1,4 @@
-from fastapi import APIRouter
+from fastapi import APIRouter, HTTPException
 from sqlalchemy import text
 from src.utils.connection import get_session
 from src.endpoints.book.delete.response import error_responses
