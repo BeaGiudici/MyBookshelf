@@ -11,4 +11,6 @@ router = APIRouter(prefix=path, tags=tags)
 async def get_books() -> list[Book]:
     with get_session() as db:
         books = db.query(Book).order_by(Book.id).all()
+        if books is None:
+            raise HTTPException(status_code=404, detail="No books found.")
     return books

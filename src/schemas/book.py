@@ -12,7 +12,15 @@ class Book(SQLModel, table=True):
     author_id: int | None = Field(default=None, foreign_key="author.id")
     status_id: int | None = Field(default=None, foreign_key="status.id")
     author: Optional["Author"] = Relationship(back_populates="books")
-    genres: List["Genre"] = Relationship(
+    genres: Optional[List["Genre"]] = Relationship(
         back_populates="books", link_model=BookGenreLink, passive_deletes=True
     )
     status: Optional["Status"] = Relationship(back_populates="books")
+
+class BookUpdate(SQLModel):
+    id: int
+    title: Optional[str] = None
+    isbn: Optional[str] = None
+    year: Optional[int] = Field(default=None)
+    author_id: Optional[int] = Field(default=None)
+    status_id: Optional[int] = Field(default=None)
