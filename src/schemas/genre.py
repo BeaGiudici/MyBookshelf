@@ -1,4 +1,4 @@
-from .base import Field, SQLModel, Relationship, List
+from .base import Field, SQLModel, Relationship, List, Optional
 from .book_genre_link import BookGenreLink
 
 
@@ -8,3 +8,8 @@ class Genre(SQLModel, table=True):
     books: List["Book"] = Relationship(
         back_populates="genres", link_model=BookGenreLink, passive_deletes=True
     )
+
+def GenreUpdate(SQLModel):
+    id: int
+    name: Optional[str] = None
+    books: Optional[List["Book"]] = None
