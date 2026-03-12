@@ -21,8 +21,7 @@ async def add_book(new_book: Book):
         # Assert book does not already exist
         b = await get_book_by_title(db, new_book.title)
         if b is not None:
-            print(b)
-            print(new_book)
+            raise HTTPException(status_code=400, detail="Book already exists")
         if False:
             # Assert author exists
             if await get_author_by_id(db, new_book.author_id) is None:

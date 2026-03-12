@@ -17,6 +17,13 @@ from src.endpoints.author.read.read_author import router as read_author_router
 from src.endpoints.author.update.update_author import router as update_author_router
 from src.endpoints.author.delete.delete_author import router as delete_author_router
 
+# Status endpoints
+from src.endpoints.status.create.add_status import router as add_status_router
+from src.endpoints.status.read.read_all import router as read_all_statuses_router
+from src.endpoints.status.read.read_status import router as read_status_router
+from src.endpoints.status.update.update_status import router as update_status_router
+from src.endpoints.status.delete.delete_status import router as delete_status_router
+
 app = FastAPI(name="My Bookshelf", version="0.1.0")
 
 # Include the necessary routers
@@ -33,6 +40,13 @@ app.include_router(read_all_authors_router)
 app.include_router(read_author_router)
 app.include_router(update_author_router)
 app.include_router(delete_author_router)
+
+# Status endpoints
+app.include_router(add_status_router)
+app.include_router(read_all_statuses_router)
+app.include_router(read_status_router)
+app.include_router(update_status_router)
+app.include_router(delete_status_router)
 
 @app.get("/")
 def read_root():

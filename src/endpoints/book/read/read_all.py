@@ -1,4 +1,4 @@
-from fastapi import APIRouter
+from fastapi import APIRouter, HTTPException
 from src.schemas.book import Book
 from src.utils.connection import get_session
 
