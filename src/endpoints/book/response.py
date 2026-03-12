@@ -2,7 +2,7 @@ error_responses = {
     400: {
         "description": "Bad Request",
         "content": {
-            "application/json": {"example": {"detail": "Invalid author data"}}
+            "application/json": {"example": {"detail": "Invalid book data"}},
         },
     },
     401: {
@@ -15,13 +15,13 @@ error_responses = {
     },
     404: {
         "description": "Not Found",
-        "content": {"application/json": {"example": {"detail": "Author not found"}}},
+        "content": {"application/json": {"example": {"detail": "Book not found. Check if the book exists."}}},
     },
     422: {
         "description": "Unprocessable Entity",
         "content": {
             "application/json": {
-                "example": {"detail": "Invalid author data: field required"}
+                "example": {"detail": "Invalid book data: field required"}
             }
         },
     },

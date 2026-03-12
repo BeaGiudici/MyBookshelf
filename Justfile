@@ -16,12 +16,12 @@ setup:
 # Database creation
 [group("database")]
 create-database:
-    @uv run src/utils/db.py
+    @uv run src/db/db.py
 
 # Database reset
 [group("database")]
 reset-database:
-    @uv run src/utils/db.py --reset
+    @uv run src/db/db.py --reset
 
 # Fake entries creation
 [group("fake-entries")]
@@ -31,7 +31,7 @@ populate-fake:
 # API
 [group("api")]
 run-api:
-    @uv run uvicorn src.main:app --reload --host 0.0.0.0 --port 8000
+    @uv run uvicorn src.api:app --reload --host 0.0.0.0 --port 8000
 
 # -------------------------
 # Code quality

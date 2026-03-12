@@ -1,7 +1,6 @@
-from .author import Author
-from .book import Book
-from .book_genre_link import BookGenreLink
-from .genre import Genre
-from .status import Status
+from .author_schemas import AuthorUpdate
+from .book_schemas import BookUpdate
+from .genre_schemas import GenreUpdate
+from .status_schemas import StatusUpdate
 
-__all__ = ["Author", "Book", "Genre", "Status"]
+__all__ = ["AuthorUpdate", "BookUpdate", "GenreUpdate", "StatusUpdate"]

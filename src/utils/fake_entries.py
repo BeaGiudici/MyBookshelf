@@ -1,9 +1,6 @@
 # Create fake entries for the database
 
-from src.schemas.book import Book
-from src.schemas.author import Author
-from src.schemas.genre import Genre
-from src.schemas.status import Status
+from src.database.models import Book, Author, Genre, Status
 from faker import Faker
 import warnings
 
