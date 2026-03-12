@@ -69,7 +69,7 @@ if __name__ == "__main__":
     import argparse
 
     parser = argparse.ArgumentParser()
-    parser.add_argument("--reset", action="store_true", help="Reset the database")
+    parser.add_argument("--reset", action="store_true", help="Reset the database", default=False)
     parser.add_argument(
         "--debug", action="store_true", default=False, help="Show debug information"
     )
