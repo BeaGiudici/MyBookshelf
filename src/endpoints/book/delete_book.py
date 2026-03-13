@@ -10,4 +10,4 @@ router = APIRouter()
 @router.delete(path=path, response_model=dict, responses=error_responses, tags=tags)
 async def delete_book(book_id: int):
     msg = delete_book_service(book_id)
-    return msg
+    return dict(msg=msg)

@@ -20,7 +20,7 @@ class BookCreate(BaseModel):
 
 
 class BookUpdate(BaseModel):
-    id: int
+    id: Optional[int] = None
     title: Optional[str] = None
     isbn: Optional[str] = None
     year: Optional[int] = None

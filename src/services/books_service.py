@@ -8,6 +8,7 @@ from src.repositories.books_repo import (
 )
 from src.repositories.authors_repo import get_author_by_id
 from src.database.models import Book
+from src.schemas.book_schemas import BookCreate, BookUpdate
 from fastapi import HTTPException
 
 
@@ -21,11 +22,22 @@ def get_all_books_service():
 def get_book_by_id_service(book_id: int):
     book = get_book_by_id(book_id)
     if book is None:
-        raise HTTPException(status_code=404, detail="Book not found.")
+        raise HTTPException(
+            status_code=404, detail=f"Book with ID {book_id} not found."
+        )
     return book
 
 
-def add_book_service(new_book):
+def get_book_by_title_service(book_title: str):
+    book = get_book_by_title(book_title)
+    if book is None:
+        raise HTTPException(
+            status_code=404, detail=f"Book with title {book_title} not found."
+        )
+    return book
+
+
+def add_book_service(new_book: BookCreate):
     if (
         new_book.title is None
         or new_book.isbn is None
@@ -37,11 +49,11 @@ def add_book_service(new_book):
 
     existing = get_book_by_title(new_book.title)
     if existing is not None:
-        raise HTTPException(status_code=400, detail="Book already exists")
+        raise HTTPException(status_code=400, detail="Book already exists.")
 
     author = get_author_by_id(new_book.author_id)
     if author is None:
-        raise HTTPException(status_code=400, detail="Author not found")
+        raise HTTPException(status_code=400, detail="Author not found.")
 
     book = Book(
         title=new_book.title,
@@ -53,10 +65,16 @@ def add_book_service(new_book):
     return add_book_repo(book)
 
 
-def update_book_service(book_update):
-    book = get_book_by_id(book_update.id)
-    if book is None:
-        raise HTTPException(status_code=404, detail="Book not found.")
+def update_book_service(book_update: BookUpdate):
+    if book_update.id is not None:
+        book = get_book_by_id_service(book_update.id)
+    elif book_update.title is not None:
+        book = get_book_by_title_service(book_update.title)
+    else:
+        raise HTTPException(
+            status_code=400,
+            detail="Missing required fields. Provide either ID or title.",
+        )
 
     if book_update.title is not None:
         book.title = book_update.title
@@ -76,4 +94,5 @@ def delete_book_service(book_id: int):
     book = get_book_by_id(book_id)
     if book is None:
         raise HTTPException(status_code=404, detail="Book not found.")
-    return delete_book(book_id)
+    msg = delete_book(book_id)
+    return msg
