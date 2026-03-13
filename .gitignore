@@ -4,3 +4,4 @@ bookshelf.db
 __pycache__/
 .ruff_cache/
 frontend/node_modules/
+frontend/.vite/
