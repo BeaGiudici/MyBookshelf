@@ -181,11 +181,3 @@ book_database/
 ├── requirements.txt
 └── README.md
 ```
-
-## What's next?
-- ML (see ChatGPT discussion)
-- Web scraping
-- Deployment (Terraform?)
-- Monitoring / Observability
-- Authentication
-- Tests
