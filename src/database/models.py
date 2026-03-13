@@ -11,8 +11,8 @@ class BookGenreLink(SQLModel, table=True):
 class Book(SQLModel, table=True):
     id: int | None = Field(default=None, primary_key=True)
     title: str = Field(index=True)
-    isbn: str
-    year: int
+    isbn: str | None = Field(default=None)
+    year: int | None = Field(default=None)
     author_id: int | None = Field(default=None, foreign_key="author.id", ondelete="CASCADE")
     status_id: int | None = Field(default=None, foreign_key="status.id", ondelete="CASCADE")
     author: Optional["Author"] = Relationship(back_populates="books", passive_deletes=True)
