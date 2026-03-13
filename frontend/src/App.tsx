@@ -277,504 +277,6 @@ const App: React.FC = () => {
           </p>
         </header>
 
-        {/* Genres */}
-        <section
-          style={{
-            display: "flex",
-            gap: "1.75rem",
-            flexWrap: "wrap",
-            alignItems: "flex-start"
-          }}
-        >
-          <form
-            onSubmit={handleAddGenre}
-            style={{
-              flex: "1 1 260px",
-              padding: "1.25rem 1.5rem",
-              borderRadius: "0.875rem",
-              border: "1px solid #e5e7eb",
-              backgroundColor: "#f9fafb"
-            }}
-          >
-            <h2
-              style={{
-                fontSize: "1rem",
-                fontWeight: 600,
-                color: "#111827",
-                marginBottom: "0.75rem"
-              }}
-            >
-              Add a new genre
-            </h2>
-            <label
-              htmlFor="genreName"
-              style={{
-                display: "block",
-                fontSize: "0.8rem",
-                fontWeight: 500,
-                color: "#6b7280",
-                marginBottom: "0.35rem"
-              }}
-            >
-              Genre name
-            </label>
-            <input
-              id="genreName"
-              type="text"
-              value={newGenreName}
-              onChange={(e) => setNewGenreName(e.target.value)}
-              placeholder="e.g. Fantasy"
-              style={{
-                width: "100%",
-                padding: "0.6rem 0.75rem",
-                borderRadius: "0.6rem",
-                border: "1px solid #d1d5db",
-                fontSize: "0.9rem",
-                outline: "none",
-                marginBottom: "0.75rem",
-                transition: "border-color 0.15s, box-shadow 0.15s"
-              }}
-              onFocus={(e) => {
-                e.target.style.borderColor = "#6366f1";
-                e.target.style.boxShadow =
-                  "0 0 0 1px rgba(79, 70, 229, 0.3)";
-              }}
-              onBlur={(e) => {
-                e.target.style.borderColor = "#d1d5db";
-                e.target.style.boxShadow = "none";
-              }}
-            />
-            <button
-              type="submit"
-              disabled={loading || !newGenreName.trim()}
-              style={{
-                display: "inline-flex",
-                alignItems: "center",
-                justifyContent: "center",
-                gap: "0.35rem",
-                padding: "0.55rem 0.9rem",
-                borderRadius: "999px",
-                border: "none",
-                fontSize: "0.85rem",
-                fontWeight: 600,
-                cursor: loading || !newGenreName.trim() ? "not-allowed" : "pointer",
-                background:
-                  loading || !newGenreName.trim()
-                    ? "#e5e7eb"
-                    : "linear-gradient(135deg, #4f46e5, #6366f1)",
-                color:
-                  loading || !newGenreName.trim() ? "#9ca3af" : "white",
-                boxShadow:
-                  loading || !newGenreName.trim()
-                    ? "none"
-                    : "0 8px 18px rgba(79, 70, 229, 0.35)",
-                transition:
-                  "transform 0.1s ease-out, box-shadow 0.1s ease-out, filter 0.1s"
-              }}
-            >
-              <span>+ Add genre</span>
-            </button>
-          </form>
-
-          <div
-            style={{
-              flex: "1.4 1 320px",
-              minHeight: "180px"
-            }}
-          >
-            <div
-              style={{
-                display: "flex",
-                justifyContent: "space-between",
-                alignItems: "center",
-                marginBottom: "0.75rem"
-              }}
-            >
-              <h2
-                style={{
-                  fontSize: "1rem",
-                  fontWeight: 600,
-                  color: "#111827"
-                }}
-              >
-                Existing genres
-              </h2>
-              <button
-                type="button"
-                onClick={fetchGenres}
-                disabled={loading}
-                style={{
-                  fontSize: "0.8rem",
-                  padding: "0.35rem 0.7rem",
-                  borderRadius: "999px",
-                  border: "1px solid #e5e7eb",
-                  backgroundColor: "white",
-                  cursor: loading ? "not-allowed" : "pointer",
-                  color: "#4b5563"
-                }}
-              >
-                Refresh
-              </button>
-            </div>
-
-            {loading && (
-              <p style={{ fontSize: "0.85rem", color: "#6b7280" }}>
-                Loading...
-              </p>
-            )}
-
-            {error && (
-              <p
-                style={{
-                  fontSize: "0.85rem",
-                  color: "#b91c1c",
-                  marginBottom: "0.75rem"
-                }}
-              >
-                {error}
-              </p>
-            )}
-
-            {genres.length === 0 && !loading ? (
-              <p
-                style={{
-                  fontSize: "0.9rem",
-                  color: "#9ca3af",
-                  fontStyle: "italic"
-                }}
-              >
-                No genres yet. Add your first one using the form on the left.
-              </p>
-            ) : (
-              <ul
-                style={{
-                  listStyle: "none",
-                  padding: 0,
-                  margin: 0,
-                  display: "grid",
-                  gridTemplateColumns: "repeat(auto-fill, minmax(140px, 1fr))",
-                  gap: "0.5rem"
-                }}
-              >
-                {genres.map((genre) => (
-                  <li
-                    key={genre.id}
-                    style={{
-                      padding: "0.55rem 0.75rem",
-                      borderRadius: "0.75rem",
-                      backgroundColor: "#f9fafb",
-                      border: "1px solid #e5e7eb",
-                      fontSize: "0.85rem",
-                      color: "#111827"
-                    }}
-                  >
-                    {genre.name}
-                  </li>
-                ))}
-              </ul>
-            )}
-          </div>
-        </section>
-
-        {/* Authors */}
-        <section
-          style={{
-            marginTop: "2rem",
-            paddingTop: "1.5rem",
-            borderTop: "1px solid #e5e7eb"
-          }}
-        >
-          <div
-            style={{
-              display: "flex",
-              gap: "1.75rem",
-              flexWrap: "wrap",
-              alignItems: "flex-start"
-            }}
-          >
-            <form
-              onSubmit={handleAddAuthor}
-              style={{
-                flex: "1 1 260px",
-                padding: "1.25rem 1.5rem",
-                borderRadius: "0.875rem",
-                border: "1px solid #e5e7eb",
-                backgroundColor: "#f9fafb"
-              }}
-            >
-              <h2
-                style={{
-                  fontSize: "1rem",
-                  fontWeight: 600,
-                  color: "#111827",
-                  marginBottom: "0.75rem"
-                }}
-              >
-                Add a new author
-              </h2>
-
-              <label
-                htmlFor="authorName"
-                style={{
-                  display: "block",
-                  fontSize: "0.8rem",
-                  fontWeight: 500,
-                  color: "#6b7280",
-                  marginBottom: "0.35rem"
-                }}
-              >
-                Name
-              </label>
-              <input
-                id="authorName"
-                type="text"
-                value={newAuthor.name}
-                onChange={(e) =>
-                  setNewAuthor((prev) => ({ ...prev, name: e.target.value }))
-                }
-                placeholder="e.g. Ursula K. Le Guin"
-                style={{
-                  width: "100%",
-                  padding: "0.6rem 0.75rem",
-                  borderRadius: "0.6rem",
-                  border: "1px solid #d1d5db",
-                  fontSize: "0.9rem",
-                  outline: "none",
-                  marginBottom: "0.75rem"
-                }}
-              />
-
-              <label
-                htmlFor="authorDob"
-                style={{
-                  display: "block",
-                  fontSize: "0.8rem",
-                  fontWeight: 500,
-                  color: "#6b7280",
-                  marginBottom: "0.35rem"
-                }}
-              >
-                Date of birth
-              </label>
-              <input
-                id="authorDob"
-                type="date"
-                value={newAuthor.date_of_birth}
-                onChange={(e) =>
-                  setNewAuthor((prev) => ({
-                    ...prev,
-                    date_of_birth: e.target.value
-                  }))
-                }
-                style={{
-                  width: "100%",
-                  padding: "0.6rem 0.75rem",
-                  borderRadius: "0.6rem",
-                  border: "1px solid #d1d5db",
-                  fontSize: "0.9rem",
-                  outline: "none",
-                  marginBottom: "0.75rem"
-                }}
-              />
-
-              <label
-                htmlFor="authorDod"
-                style={{
-                  display: "block",
-                  fontSize: "0.8rem",
-                  fontWeight: 500,
-                  color: "#6b7280",
-                  marginBottom: "0.35rem"
-                }}
-              >
-                Date of death (optional)
-              </label>
-              <input
-                id="authorDod"
-                type="date"
-                value={newAuthor.date_of_death}
-                onChange={(e) =>
-                  setNewAuthor((prev) => ({
-                    ...prev,
-                    date_of_death: e.target.value
-                  }))
-                }
-                style={{
-                  width: "100%",
-                  padding: "0.6rem 0.75rem",
-                  borderRadius: "0.6rem",
-                  border: "1px solid #d1d5db",
-                  fontSize: "0.9rem",
-                  outline: "none",
-                  marginBottom: "0.75rem"
-                }}
-              />
-
-              <label
-                htmlFor="authorCountry"
-                style={{
-                  display: "block",
-                  fontSize: "0.8rem",
-                  fontWeight: 500,
-                  color: "#6b7280",
-                  marginBottom: "0.35rem"
-                }}
-              >
-                Country
-              </label>
-              <input
-                id="authorCountry"
-                type="text"
-                value={newAuthor.country}
-                onChange={(e) =>
-                  setNewAuthor((prev) => ({
-                    ...prev,
-                    country: e.target.value
-                  }))
-                }
-                placeholder="e.g. United States"
-                style={{
-                  width: "100%",
-                  padding: "0.6rem 0.75rem",
-                  borderRadius: "0.6rem",
-                  border: "1px solid #d1d5db",
-                  fontSize: "0.9rem",
-                  outline: "none",
-                  marginBottom: "0.75rem"
-                }}
-              />
-
-              <button
-                type="submit"
-                disabled={
-                  loading ||
-                  !newAuthor.name.trim() ||
-                  !newAuthor.date_of_birth ||
-                  !newAuthor.country.trim()
-                }
-                style={{
-                  display: "inline-flex",
-                  alignItems: "center",
-                  justifyContent: "center",
-                  gap: "0.35rem",
-                  padding: "0.55rem 0.9rem",
-                  borderRadius: "999px",
-                  border: "none",
-                  fontSize: "0.85rem",
-                  fontWeight: 600,
-                  cursor:
-                    loading ||
-                    !newAuthor.name.trim() ||
-                    !newAuthor.date_of_birth ||
-                    !newAuthor.country.trim()
-                      ? "not-allowed"
-                      : "pointer",
-                  background:
-                    loading ||
-                    !newAuthor.name.trim() ||
-                    !newAuthor.date_of_birth ||
-                    !newAuthor.country.trim()
-                      ? "#e5e7eb"
-                      : "linear-gradient(135deg, #4f46e5, #6366f1)",
-                  color:
-                    loading ||
-                    !newAuthor.name.trim() ||
-                    !newAuthor.date_of_birth ||
-                    !newAuthor.country.trim()
-                      ? "#9ca3af"
-                      : "white"
-                }}
-              >
-                <span>+ Add author</span>
-              </button>
-            </form>
-
-            <div
-              style={{
-                flex: "1.4 1 320px",
-                minHeight: "180px"
-              }}
-            >
-              <div
-                style={{
-                  display: "flex",
-                  justifyContent: "space-between",
-                  alignItems: "center",
-                  marginBottom: "0.75rem"
-                }}
-              >
-                <h2
-                  style={{
-                    fontSize: "1rem",
-                    fontWeight: 600,
-                    color: "#111827"
-                  }}
-                >
-                  Existing authors
-                </h2>
-                <button
-                  type="button"
-                  onClick={fetchAuthors}
-                  disabled={loading}
-                  style={{
-                    fontSize: "0.8rem",
-                    padding: "0.35rem 0.7rem",
-                    borderRadius: "999px",
-                    border: "1px solid #e5e7eb",
-                    backgroundColor: "white",
-                    cursor: loading ? "not-allowed" : "pointer",
-                    color: "#4b5563"
-                  }}
-                >
-                  Refresh
-                </button>
-              </div>
-
-              {authors.length === 0 && !loading ? (
-                <p
-                  style={{
-                    fontSize: "0.9rem",
-                    color: "#9ca3af",
-                    fontStyle: "italic"
-                  }}
-                >
-                  No authors yet. Add your first one using the form on the left.
-                </p>
-              ) : (
-                <ul
-                  style={{
-                    listStyle: "none",
-                    padding: 0,
-                    margin: 0,
-                    display: "flex",
-                    flexDirection: "column",
-                    gap: "0.4rem"
-                  }}
-                >
-                  {authors.map((author) => (
-                    <li
-                      key={author.id}
-                      style={{
-                        padding: "0.55rem 0.75rem",
-                        borderRadius: "0.75rem",
-                        backgroundColor: "#f9fafb",
-                        border: "1px solid #e5e7eb",
-                        fontSize: "0.85rem",
-                        color: "#111827"
-                      }}
-                    >
-                      <span style={{ fontWeight: 600 }}>{author.name}</span>
-                      <span style={{ color: "#6b7280", marginLeft: "0.35rem" }}>
-                        ({author.country})
-                      </span>
-                    </li>
-                  ))}
-                </ul>
-              )}
-            </div>
-          </div>
-        </section>
-
         {/* Books */}
         <section
           style={{
@@ -1097,6 +599,494 @@ const App: React.FC = () => {
                         ({book.year}) · Author ID {book.author_id} · Status ID{" "}
                         {book.status_id}
                       </span>
+                    </li>
+                  ))}
+                </ul>
+              )}
+            </div>
+          </div>
+        </section>
+
+        {/* Authors */}
+        <section
+          style={{
+            marginTop: "2rem",
+            paddingTop: "1.5rem",
+            borderTop: "1px solid #e5e7eb"
+          }}
+        >
+          <div
+            style={{
+              display: "flex",
+              gap: "1.75rem",
+              flexWrap: "wrap",
+              alignItems: "flex-start"
+            }}
+          >
+            <form
+              onSubmit={handleAddAuthor}
+              style={{
+                flex: "1 1 260px",
+                padding: "1.25rem 1.5rem",
+                borderRadius: "0.875rem",
+                border: "1px solid #e5e7eb",
+                backgroundColor: "#f9fafb"
+              }}
+            >
+              <h2
+                style={{
+                  fontSize: "1rem",
+                  fontWeight: 600,
+                  color: "#111827",
+                  marginBottom: "0.75rem"
+                }}
+              >
+                Add a new author
+              </h2>
+
+              <label
+                htmlFor="authorName"
+                style={{
+                  display: "block",
+                  fontSize: "0.8rem",
+                  fontWeight: 500,
+                  color: "#6b7280",
+                  marginBottom: "0.35rem"
+                }}
+              >
+                Name
+              </label>
+              <input
+                id="authorName"
+                type="text"
+                value={newAuthor.name}
+                onChange={(e) =>
+                  setNewAuthor((prev) => ({ ...prev, name: e.target.value }))
+                }
+                placeholder="e.g. Ursula K. Le Guin"
+                style={{
+                  width: "100%",
+                  padding: "0.6rem 0.75rem",
+                  borderRadius: "0.6rem",
+                  border: "1px solid #d1d5db",
+                  fontSize: "0.9rem",
+                  outline: "none",
+                  marginBottom: "0.75rem"
+                }}
+              />
+
+              <label
+                htmlFor="authorDob"
+                style={{
+                  display: "block",
+                  fontSize: "0.8rem",
+                  fontWeight: 500,
+                  color: "#6b7280",
+                  marginBottom: "0.35rem"
+                }}
+              >
+                Date of birth
+              </label>
+              <input
+                id="authorDob"
+                type="date"
+                value={newAuthor.date_of_birth}
+                onChange={(e) =>
+                  setNewAuthor((prev) => ({
+                    ...prev,
+                    date_of_birth: e.target.value
+                  }))
+                }
+                style={{
+                  width: "100%",
+                  padding: "0.6rem 0.75rem",
+                  borderRadius: "0.6rem",
+                  border: "1px solid #d1d5db",
+                  fontSize: "0.9rem",
+                  outline: "none",
+                  marginBottom: "0.75rem"
+                }}
+              />
+
+              <label
+                htmlFor="authorDod"
+                style={{
+                  display: "block",
+                  fontSize: "0.8rem",
+                  fontWeight: 500,
+                  color: "#6b7280",
+                  marginBottom: "0.35rem"
+                }}
+              >
+                Date of death (optional)
+              </label>
+              <input
+                id="authorDod"
+                type="date"
+                value={newAuthor.date_of_death}
+                onChange={(e) =>
+                  setNewAuthor((prev) => ({
+                    ...prev,
+                    date_of_death: e.target.value
+                  }))
+                }
+                style={{
+                  width: "100%",
+                  padding: "0.6rem 0.75rem",
+                  borderRadius: "0.6rem",
+                  border: "1px solid #d1d5db",
+                  fontSize: "0.9rem",
+                  outline: "none",
+                  marginBottom: "0.75rem"
+                }}
+              />
+
+              <label
+                htmlFor="authorCountry"
+                style={{
+                  display: "block",
+                  fontSize: "0.8rem",
+                  fontWeight: 500,
+                  color: "#6b7280",
+                  marginBottom: "0.35rem"
+                }}
+              >
+                Country
+              </label>
+              <input
+                id="authorCountry"
+                type="text"
+                value={newAuthor.country}
+                onChange={(e) =>
+                  setNewAuthor((prev) => ({
+                    ...prev,
+                    country: e.target.value
+                  }))
+                }
+                placeholder="e.g. United States"
+                style={{
+                  width: "100%",
+                  padding: "0.6rem 0.75rem",
+                  borderRadius: "0.6rem",
+                  border: "1px solid #d1d5db",
+                  fontSize: "0.9rem",
+                  outline: "none",
+                  marginBottom: "0.75rem"
+                }}
+              />
+
+              <button
+                type="submit"
+                disabled={
+                  loading ||
+                  !newAuthor.name.trim() ||
+                  !newAuthor.date_of_birth ||
+                  !newAuthor.country.trim()
+                }
+                style={{
+                  display: "inline-flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  gap: "0.35rem",
+                  padding: "0.55rem 0.9rem",
+                  borderRadius: "999px",
+                  border: "none",
+                  fontSize: "0.85rem",
+                  fontWeight: 600,
+                  cursor:
+                    loading ||
+                    !newAuthor.name.trim() ||
+                    !newAuthor.date_of_birth ||
+                    !newAuthor.country.trim()
+                      ? "not-allowed"
+                      : "pointer",
+                  background:
+                    loading ||
+                    !newAuthor.name.trim() ||
+                    !newAuthor.date_of_birth ||
+                    !newAuthor.country.trim()
+                      ? "#e5e7eb"
+                      : "linear-gradient(135deg, #4f46e5, #6366f1)",
+                  color:
+                    loading ||
+                    !newAuthor.name.trim() ||
+                    !newAuthor.date_of_birth ||
+                    !newAuthor.country.trim()
+                      ? "#9ca3af"
+                      : "white"
+                }}
+              >
+                <span>+ Add author</span>
+              </button>
+            </form>
+
+            <div
+              style={{
+                flex: "1.4 1 320px",
+                minHeight: "180px"
+              }}
+            >
+              <div
+                style={{
+                  display: "flex",
+                  justifyContent: "space-between",
+                  alignItems: "center",
+                  marginBottom: "0.75rem"
+                }}
+              >
+                <h2
+                  style={{
+                    fontSize: "1rem",
+                    fontWeight: 600,
+                    color: "#111827"
+                  }}
+                >
+                  Existing authors
+                </h2>
+                <button
+                  type="button"
+                  onClick={fetchAuthors}
+                  disabled={loading}
+                  style={{
+                    fontSize: "0.8rem",
+                    padding: "0.35rem 0.7rem",
+                    borderRadius: "999px",
+                    border: "1px solid #e5e7eb",
+                    backgroundColor: "white",
+                    cursor: loading ? "not-allowed" : "pointer",
+                    color: "#4b5563"
+                  }}
+                >
+                  Refresh
+                </button>
+              </div>
+
+              {authors.length === 0 && !loading ? (
+                <p
+                  style={{
+                    fontSize: "0.9rem",
+                    color: "#9ca3af",
+                    fontStyle: "italic"
+                  }}
+                >
+                  No authors yet. Add your first one using the form on the left.
+                </p>
+              ) : (
+                <ul
+                  style={{
+                    listStyle: "none",
+                    padding: 0,
+                    margin: 0,
+                    display: "flex",
+                    flexDirection: "column",
+                    gap: "0.4rem"
+                  }}
+                >
+                  {authors.map((author) => (
+                    <li
+                      key={author.id}
+                      style={{
+                        padding: "0.55rem 0.75rem",
+                        borderRadius: "0.75rem",
+                        backgroundColor: "#f9fafb",
+                        border: "1px solid #e5e7eb",
+                        fontSize: "0.85rem",
+                        color: "#111827"
+                      }}
+                    >
+                      <span style={{ fontWeight: 600 }}>{author.name}</span>
+                      <span style={{ color: "#6b7280", marginLeft: "0.35rem" }}>
+                        ({author.country})
+                      </span>
+                    </li>
+                  ))}
+                </ul>
+              )}
+            </div>
+          </div>
+        </section>
+
+        {/* Genres */}
+        <section
+          style={{
+            marginTop: "2rem",
+            paddingTop: "1.5rem",
+            borderTop: "1px solid #e5e7eb"
+          }}
+        >
+          <div
+            style={{
+              display: "flex",
+              gap: "1.75rem",
+              flexWrap: "wrap",
+              alignItems: "flex-start"
+            }}
+          >
+            <form
+              onSubmit={handleAddGenre}
+              style={{
+                flex: "1 1 260px",
+                padding: "1.25rem 1.5rem",
+                borderRadius: "0.875rem",
+                border: "1px solid #e5e7eb",
+                backgroundColor: "#f9fafb"
+              }}
+            >
+              <h2
+                style={{
+                  fontSize: "1rem",
+                  fontWeight: 600,
+                  color: "#111827",
+                  marginBottom: "0.75rem"
+                }}
+              >
+                Add a new genre
+              </h2>
+              <label
+                htmlFor="genreName"
+                style={{
+                  display: "block",
+                  fontSize: "0.8rem",
+                  fontWeight: 500,
+                  color: "#6b7280",
+                  marginBottom: "0.35rem"
+                }}
+              >
+                Genre name
+              </label>
+              <input
+                id="genreName"
+                type="text"
+                value={newGenreName}
+                onChange={(e) => setNewGenreName(e.target.value)}
+                placeholder="e.g. Fantasy"
+                style={{
+                  width: "100%",
+                  padding: "0.6rem 0.75rem",
+                  borderRadius: "0.6rem",
+                  border: "1px solid #d1d5db",
+                  fontSize: "0.9rem",
+                  outline: "none",
+                  marginBottom: "0.75rem",
+                  transition: "border-color 0.15s, box-shadow 0.15s"
+                }}
+                onFocus={(e) => {
+                  e.target.style.borderColor = "#6366f1";
+                  e.target.style.boxShadow =
+                    "0 0 0 1px rgba(79, 70, 229, 0.3)";
+                }}
+                onBlur={(e) => {
+                  e.target.style.borderColor = "#d1d5db";
+                  e.target.style.boxShadow = "none";
+                }}
+              />
+              <button
+                type="submit"
+                disabled={loading || !newGenreName.trim()}
+                style={{
+                  display: "inline-flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  gap: "0.35rem",
+                  padding: "0.55rem 0.9rem",
+                  borderRadius: "999px",
+                  border: "none",
+                  fontSize: "0.85rem",
+                  fontWeight: 600,
+                  cursor: loading || !newGenreName.trim() ? "not-allowed" : "pointer",
+                  background:
+                    loading || !newGenreName.trim()
+                      ? "#e5e7eb"
+                      : "linear-gradient(135deg, #4f46e5, #6366f1)",
+                  color:
+                    loading || !newGenreName.trim() ? "#9ca3af" : "white",
+                  boxShadow:
+                    loading || !newGenreName.trim()
+                      ? "none"
+                      : "0 8px 18px rgba(79, 70, 229, 0.35)",
+                  transition:
+                    "transform 0.1s ease-out, box-shadow 0.1s ease-out, filter 0.1s"
+                }}
+              >
+                <span>+ Add genre</span>
+              </button>
+            </form>
+
+            <div
+              style={{
+                flex: "1.4 1 320px",
+                minHeight: "180px"
+              }}
+            >
+              <div
+                style={{
+                  display: "flex",
+                  justifyContent: "space-between",
+                  alignItems: "center",
+                  marginBottom: "0.75rem"
+                }}
+              >
+                <h2
+                  style={{
+                    fontSize: "1rem",
+                    fontWeight: 600,
+                    color: "#111827"
+                  }}
+                >
+                  Existing genres
+                </h2>
+                <button
+                  type="button"
+                  onClick={fetchGenres}
+                  disabled={loading}
+                  style={{
+                    fontSize: "0.8rem",
+                    padding: "0.35rem 0.7rem",
+                    borderRadius: "999px",
+                    border: "1px solid #e5e7eb",
+                    backgroundColor: "white",
+                    cursor: loading ? "not-allowed" : "pointer",
+                    color: "#4b5563"
+                  }}
+                >
+                  Refresh
+                </button>
+              </div>
+
+              {genres.length === 0 && !loading ? (
+                <p
+                  style={{
+                    fontSize: "0.9rem",
+                    color: "#9ca3af",
+                    fontStyle: "italic"
+                  }}
+                >
+                  No genres yet. Add your first one using the form on the left.
+                </p>
+              ) : (
+                <ul
+                  style={{
+                    listStyle: "none",
+                    padding: 0,
+                    margin: 0,
+                    display: "grid",
+                    gridTemplateColumns: "repeat(auto-fill, minmax(140px, 1fr))",
+                    gap: "0.5rem"
+                  }}
+                >
+                  {genres.map((genre) => (
+                    <li
+                      key={genre.id}
+                      style={{
+                        padding: "0.55rem 0.75rem",
+                        borderRadius: "0.75rem",
+                        backgroundColor: "#f9fafb",
+                        border: "1px solid #e5e7eb",
+                        fontSize: "0.85rem",
+                        color: "#111827"
+                      }}
+                    >
+                      {genre.name}
                     </li>
                   ))}
                 </ul>

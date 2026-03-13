@@ -6,7 +6,7 @@ export default defineConfig({
   server: {
     port: 5173,
     proxy: {
-      "/genre": {
+      "/book": {
         target: "http://localhost:8000",
         changeOrigin: true
       },
@@ -14,7 +14,7 @@ export default defineConfig({
         target: "http://localhost:8000",
         changeOrigin: true
       },
-      "/book": {
+      "/genre": {
         target: "http://localhost:8000",
         changeOrigin: true
       }
