@@ -67,3 +67,32 @@ erDiagram
     BOOKS ||--o{ BOOKGENRELINK : "1:N"
     GENRES ||--o{ BOOKGENRELINK : "N:1"
 ```
+
+## Frontend
+
+There is a very small React + Vite frontend in the `frontend` folder that talks to the FastAPI backend.
+
+- **Install dependencies** (run from the project root):
+
+  ```bash
+  cd frontend
+  npm install
+  ```
+
+- **Run the backend** (from the project root, example with uv):
+
+  ```bash
+  uv run uvicorn src.api:app --reload
+  ```
+
+- **Run the frontend dev server**:
+
+  ```bash
+  cd frontend
+  npm run dev
+  ```
+
+The frontend expects the API to be available at `http://localhost:8000` and uses these endpoints:
+
+- `GET /genre/get/all` to fetch all genres
+- `POST /genre/create` with body `{ "name": string }` to create a new genre

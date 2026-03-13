@@ -33,6 +33,15 @@ populate-fake:
 run-api:
     @uv run uvicorn src.api:app --reload --host 0.0.0.0 --port 8000
 
+# Frontend (React + Vite)
+[group("frontend")]
+frontend-install:
+    @cd frontend && npm install
+
+[group("frontend")]
+frontend-dev:
+    @cd frontend && npm run dev
+
 # -------------------------
 # Code quality
 # -------------------------
