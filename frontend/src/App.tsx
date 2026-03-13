@@ -85,6 +85,22 @@ function submitBtnStyle(disabled: boolean): React.CSSProperties {
   };
 }
 
+async function jsonOrThrow(res: Response): Promise<unknown> {
+  const contentType = res.headers.get("content-type") ?? "";
+  if (!contentType.includes("application/json")) {
+    throw new Error(
+      `Expected JSON but got "${contentType}". Is the backend running?`
+    );
+  }
+  if (!res.ok) {
+    const body = await res.json().catch(() => ({}));
+    throw new Error(
+      (body as { detail?: string }).detail ?? `Request failed (${res.status})`
+    );
+  }
+  return res.json();
+}
+
 const App: React.FC = () => {
   const [genres, setGenres] = useState<Genre[]>([]);
   const [authors, setAuthors] = useState<Author[]>([]);
@@ -117,21 +133,17 @@ const App: React.FC = () => {
     setLoading(true);
     setError(null);
     try {
-      const [gRes, aRes, sRes, bRes] = await Promise.all([
-        fetch("/genre/get/all"),
-        fetch("/author/get/all"),
-        fetch("/status/get/all"),
-        fetch("/book/get/all")
-      ]);
-      if (!gRes.ok || !aRes.ok || !sRes.ok || !bRes.ok) {
-        throw new Error("Failed to load data from the API");
-      }
       const [gData, aData, sData, bData] = await Promise.all([
-        gRes.json(),
-        aRes.json(),
-        sRes.json(),
-        bRes.json()
-      ]);
+        fetch("/genre/get/all").then(jsonOrThrow),
+        fetch("/author/get/all").then(jsonOrThrow),
+        fetch("/status/get/all").then(jsonOrThrow),
+        fetch("/book/get/all").then(jsonOrThrow)
+      ]) as [
+        { genres: Genre[] },
+        { authors: Author[] },
+        { statuses: Status[] },
+        { books: Book[] }
+      ];
       setGenres(gData.genres);
       setAuthors(aData.authors);
       setStatuses(sData.statuses);
@@ -162,13 +174,11 @@ const App: React.FC = () => {
   const handleAddGenre = async () => {
     if (!newGenreName.trim()) return;
     try {
-      const res = await fetch("/genre/create", {
+      const data = (await fetch("/genre/create", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ name: newGenreName.trim() })
-      });
-      if (!res.ok) throw new Error(`Failed to create genre (${res.status})`);
-      const data = await res.json();
+      }).then(jsonOrThrow)) as { genre: Genre };
       setGenres((prev) => [...prev, data.genre]);
       setSelectedGenreIds((prev) => [...prev, data.genre.id]);
       setNewGenreName("");
@@ -180,8 +190,7 @@ const App: React.FC = () => {
   const handleDeleteBook = async (id: number) => {
     try {
       setError(null);
-      const res = await fetch(`/book/delete?book_id=${id}`, { method: "DELETE" });
-      if (!res.ok) throw new Error(`Failed to delete book (${res.status})`);
+      await fetch(`/book/delete?book_id=${id}`, { method: "DELETE" }).then(jsonOrThrow);
       setBooks((prev) => prev.filter((b) => b.id !== id));
     } catch (err) {
       setError((err as Error).message);
@@ -191,14 +200,12 @@ const App: React.FC = () => {
   const handleDeleteAuthor = async (id: number) => {
     try {
       setError(null);
-      const res = await fetch(`/author/delete?author_id=${id}`, { method: "DELETE" });
-      if (!res.ok) throw new Error(`Failed to delete author (${res.status})`);
+      await fetch(`/author/delete?author_id=${id}`, { method: "DELETE" }).then(jsonOrThrow);
       setAuthors((prev) => prev.filter((a) => a.id !== id));
-      const booksRes = await fetch("/book/get/all");
-      if (booksRes.ok) {
-        const data = await booksRes.json();
-        setBooks(data.books);
-      }
+      const booksData = (await fetch("/book/get/all").then(jsonOrThrow)) as {
+        books: Book[];
+      };
+      setBooks(booksData.books);
     } catch (err) {
       setError((err as Error).message);
     }
@@ -207,8 +214,7 @@ const App: React.FC = () => {
   const handleDeleteGenre = async (id: number) => {
     try {
       setError(null);
-      const res = await fetch(`/genre/delete?genre_id=${id}`, { method: "DELETE" });
-      if (!res.ok) throw new Error(`Failed to delete genre (${res.status})`);
+      await fetch(`/genre/delete?genre_id=${id}`, { method: "DELETE" }).then(jsonOrThrow);
       setGenres((prev) => prev.filter((g) => g.id !== id));
       setSelectedGenreIds((prev) => prev.filter((gid) => gid !== id));
     } catch (err) {
@@ -241,7 +247,7 @@ const App: React.FC = () => {
       if (authorMode === "existing") {
         authorId = Number(selectedAuthorId);
       } else {
-        const res = await fetch("/author/create", {
+        const data = (await fetch("/author/create", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
@@ -250,15 +256,13 @@ const App: React.FC = () => {
             date_of_death: newAuthorDod || null,
             country: newAuthorCountry.trim()
           })
-        });
-        if (!res.ok) throw new Error(`Failed to create author (${res.status})`);
-        const data = await res.json();
+        }).then(jsonOrThrow)) as { author: Author };
         authorId = data.author.id;
         setAuthors((prev) => [...prev, data.author]);
       }
 
       // Step 2: create the book
-      const bookRes = await fetch("/book/create", {
+      const bookData = (await fetch("/book/create", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -268,9 +272,7 @@ const App: React.FC = () => {
           author_id: authorId,
           status_id: Number(selectedStatusId)
         })
-      });
-      if (!bookRes.ok) throw new Error(`Failed to create book (${bookRes.status})`);
-      const bookData = await bookRes.json();
+      }).then(jsonOrThrow)) as { book: Book };
       setBooks((prev) => [...prev, bookData.book]);
 
       // Reset form
@@ -287,6 +289,7 @@ const App: React.FC = () => {
       setSelectedGenreIds([]);
       setNewGenreName("");
       setSuccess(`"${bookData.book.title}" added successfully!`);
+      setTimeout(() => setSuccess(null), 3000);
     } catch (err) {
       setError((err as Error).message);
     } finally {
