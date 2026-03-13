@@ -760,7 +760,7 @@ const App: React.FC = () => {
                     onMouseLeave={(e) => (e.currentTarget.style.color = "#9ca3af")}
                     style={deleteBtnStyle}
                   >
-                    &#128465;
+                    &#x2715;
                   </button>
                 </li>
               ))}
@@ -831,7 +831,7 @@ const App: React.FC = () => {
                     onMouseLeave={(e) => (e.currentTarget.style.color = "#9ca3af")}
                     style={deleteBtnStyle}
                   >
-                    &#128465;
+                    &#x2715;
                   </button>
                 </li>
               ))}
@@ -894,7 +894,7 @@ const App: React.FC = () => {
                     onMouseLeave={(e) => (e.currentTarget.style.color = "#9ca3af")}
                     style={deleteBtnStyle}
                   >
-                    &#128465;
+                    &#x2715;
                   </button>
                 </span>
               ))}
