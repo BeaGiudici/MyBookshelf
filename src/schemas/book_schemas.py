@@ -13,10 +13,10 @@ class BookResponse(BaseModel):
 
 class BookCreate(BaseModel):
     title: str
-    isbn: str
-    year: int
-    author_id: int
-    status_id: int
+    isbn: Optional[str] = None
+    year: Optional[int] = None
+    author_id: Optional[int] = None
+    status_id: Optional[int] = None
 
 
 class BookUpdate(BaseModel):
