@@ -9,8 +9,8 @@ class BookGenreLink(SQLModel, table=True):
 
 # Book model
 class Book(SQLModel, table=True):
-    id: int | None = Field(default=None, primary_key=True, index=True)
-    title: str
+    id: int | None = Field(default=None, primary_key=True)
+    title: str = Field(index=True)
     isbn: str
     year: int
     author_id: int | None = Field(default=None, foreign_key="author.id", ondelete="CASCADE")
@@ -23,23 +23,23 @@ class Book(SQLModel, table=True):
 
 # Author model
 class Author(SQLModel, table=True):
-    id: int | None = Field(default=None, primary_key=True, index=True)
-    name: str
+    id: int | None = Field(default=None, primary_key=True)
+    name: str = Field(index=True)
     date_of_birth: datetime.date = Field(default=datetime.date.today())
-    date_of_death: datetime.date = Field(default=datetime.date.today())
+    date_of_death: datetime.date | None = Field(default=None)
     country: str = Field(default="Unknown")
     books: List["Book"] = Relationship(back_populates="author", passive_deletes=True)
 
 # Status model
 class Status(SQLModel, table=True):
-    id: int | None = Field(default=None, primary_key=True, index=True)
-    name: str = Field(default="Unknown")
+    id: int | None = Field(default=None, primary_key=True)
+    name: str = Field(default="Unknown", index=True)
     books: List["Book"] = Relationship(back_populates="status", passive_deletes=True)
 
 # Genre model
 class Genre(SQLModel, table=True):
-    id: int | None = Field(default=None, primary_key=True, index=True)
-    name: str = Field(default="Unknown")
+    id: int | None = Field(default=None, primary_key=True)
+    name: str = Field(default="Unknown", index=True)
     books: List["Book"] = Relationship(
         back_populates="genres", link_model=BookGenreLink, passive_deletes=True
     )
