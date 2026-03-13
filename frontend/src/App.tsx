@@ -1,18 +1,6 @@
 import React, { useEffect, useState } from "react";
 
-type Genre = {
-  id: number;
-  name: string;
-};
-
-type GenresResponse = {
-  genres: Genre[];
-};
-
-type GenreResponse = {
-  genre: Genre;
-};
-
+type Genre = { id: number; name: string };
 type Author = {
   id: number;
   name: string;
@@ -20,15 +8,7 @@ type Author = {
   date_of_death: string | null;
   country: string;
 };
-
-type AuthorsResponse = {
-  authors: Author[];
-};
-
-type AuthorResponse = {
-  author: Author;
-};
-
+type Status = { id: number; name: string };
 type Book = {
   id: number;
   title: string;
@@ -38,82 +18,124 @@ type Book = {
   status_id: number;
 };
 
-type BooksResponse = {
-  books: Book[];
+const inputStyle: React.CSSProperties = {
+  width: "100%",
+  padding: "0.6rem 0.75rem",
+  borderRadius: "0.6rem",
+  border: "1px solid #d1d5db",
+  fontSize: "0.9rem",
+  outline: "none",
+  marginBottom: "0.75rem"
 };
 
-type BookResponse = {
-  book: Book;
+const labelStyle: React.CSSProperties = {
+  display: "block",
+  fontSize: "0.8rem",
+  fontWeight: 500,
+  color: "#6b7280",
+  marginBottom: "0.35rem"
 };
+
+const cardStyle: React.CSSProperties = {
+  padding: "1.25rem 1.5rem",
+  borderRadius: "0.875rem",
+  border: "1px solid #e5e7eb",
+  backgroundColor: "#f9fafb"
+};
+
+const pillStyle: React.CSSProperties = {
+  padding: "0.55rem 0.75rem",
+  borderRadius: "0.75rem",
+  backgroundColor: "#f9fafb",
+  border: "1px solid #e5e7eb",
+  fontSize: "0.85rem",
+  color: "#111827"
+};
+
+const deleteBtnStyle: React.CSSProperties = {
+  background: "none",
+  border: "none",
+  cursor: "pointer",
+  padding: "0.25rem",
+  borderRadius: "0.375rem",
+  color: "#9ca3af",
+  fontSize: "0.95rem",
+  lineHeight: 1,
+  flexShrink: 0,
+  transition: "color 0.15s"
+};
+
+function submitBtnStyle(disabled: boolean): React.CSSProperties {
+  return {
+    display: "inline-flex",
+    alignItems: "center",
+    justifyContent: "center",
+    padding: "0.55rem 0.9rem",
+    borderRadius: "999px",
+    border: "none",
+    fontSize: "0.85rem",
+    fontWeight: 600,
+    cursor: disabled ? "not-allowed" : "pointer",
+    background: disabled
+      ? "#e5e7eb"
+      : "linear-gradient(135deg, #4f46e5, #6366f1)",
+    color: disabled ? "#9ca3af" : "white",
+    boxShadow: disabled ? "none" : "0 8px 18px rgba(79,70,229,0.35)",
+    transition: "transform 0.1s, box-shadow 0.1s"
+  };
+}
 
 const App: React.FC = () => {
   const [genres, setGenres] = useState<Genre[]>([]);
-  const [newGenreName, setNewGenreName] = useState("");
-
   const [authors, setAuthors] = useState<Author[]>([]);
-  const [newAuthor, setNewAuthor] = useState({
-    name: "",
-    date_of_birth: "",
-    date_of_death: "",
-    country: ""
-  });
-
+  const [statuses, setStatuses] = useState<Status[]>([]);
   const [books, setBooks] = useState<Book[]>([]);
-  const [newBook, setNewBook] = useState({
-    title: "",
-    isbn: "",
-    year: "",
-    author_id: "",
-    status_id: ""
-  });
 
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [success, setSuccess] = useState<string | null>(null);
 
-  const fetchGenres = async () => {
-    try {
-      setLoading(true);
-      setError(null);
-      const res = await fetch("/genre/get/all");
-      if (!res.ok) {
-        throw new Error(`Failed to fetch genres (${res.status})`);
-      }
-      const data = (await res.json()) as GenresResponse;
-      setGenres(data.genres);
-    } catch (err) {
-      setError((err as Error).message);
-    } finally {
-      setLoading(false);
-    }
-  };
+  // Unified form state
+  const [bookTitle, setBookTitle] = useState("");
+  const [bookIsbn, setBookIsbn] = useState("");
+  const [bookYear, setBookYear] = useState("");
 
-  const fetchAuthors = async () => {
-    try {
-      setLoading(true);
-      setError(null);
-      const res = await fetch("/author/get/all");
-      if (!res.ok) {
-        throw new Error(`Failed to fetch authors (${res.status})`);
-      }
-      const data = (await res.json()) as AuthorsResponse;
-      setAuthors(data.authors);
-    } catch (err) {
-      setError((err as Error).message);
-    } finally {
-      setLoading(false);
-    }
-  };
+  const [authorMode, setAuthorMode] = useState<"existing" | "new">("existing");
+  const [selectedAuthorId, setSelectedAuthorId] = useState("");
+  const [newAuthorName, setNewAuthorName] = useState("");
+  const [newAuthorDob, setNewAuthorDob] = useState("");
+  const [newAuthorDod, setNewAuthorDod] = useState("");
+  const [newAuthorCountry, setNewAuthorCountry] = useState("");
 
-  const fetchBooks = async () => {
+  const [selectedStatusId, setSelectedStatusId] = useState("");
+
+  const [selectedGenreIds, setSelectedGenreIds] = useState<number[]>([]);
+  const [newGenreName, setNewGenreName] = useState("");
+
+  // Fetchers
+  const fetchAll = async () => {
+    setLoading(true);
+    setError(null);
     try {
-      setLoading(true);
-      setError(null);
-      const res = await fetch("/book/get/all");
-      if (!res.ok) {
-        throw new Error(`Failed to fetch books (${res.status})`);
+      const [gRes, aRes, sRes, bRes] = await Promise.all([
+        fetch("/genre/get/all"),
+        fetch("/author/get/all"),
+        fetch("/status/get/all"),
+        fetch("/book/get/all")
+      ]);
+      if (!gRes.ok || !aRes.ok || !sRes.ok || !bRes.ok) {
+        throw new Error("Failed to load data from the API");
       }
-      const data = (await res.json()) as BooksResponse;
-      setBooks(data.books);
+      const [gData, aData, sData, bData] = await Promise.all([
+        gRes.json(),
+        aRes.json(),
+        sRes.json(),
+        bRes.json()
+      ]);
+      setGenres(gData.genres);
+      setAuthors(aData.authors);
+      setStatuses(sData.statuses);
+      setBooks(bData.books);
     } catch (err) {
       setError((err as Error).message);
     } finally {
@@ -122,117 +144,149 @@ const App: React.FC = () => {
   };
 
   useEffect(() => {
-    fetchGenres();
-    fetchAuthors();
-    fetchBooks();
+    fetchAll();
   }, []);
 
-  const handleAddGenre = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!newGenreName.trim()) return;
+  // Helpers to look up names by id for the book list
+  const authorName = (id: number) =>
+    authors.find((a) => a.id === id)?.name ?? `Author #${id}`;
+  const statusName = (id: number) =>
+    statuses.find((s) => s.id === id)?.name ?? `Status #${id}`;
 
+  const toggleGenre = (id: number) => {
+    setSelectedGenreIds((prev) =>
+      prev.includes(id) ? prev.filter((g) => g !== id) : [...prev, id]
+    );
+  };
+
+  const handleAddGenre = async () => {
+    if (!newGenreName.trim()) return;
     try {
-      setLoading(true);
-      setError(null);
       const res = await fetch("/genre/create", {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json"
-        },
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ name: newGenreName.trim() })
       });
-      if (!res.ok) {
-        throw new Error(`Failed to add genre (${res.status})`);
-      }
-      const data = (await res.json()) as GenreResponse;
+      if (!res.ok) throw new Error(`Failed to create genre (${res.status})`);
+      const data = await res.json();
       setGenres((prev) => [...prev, data.genre]);
+      setSelectedGenreIds((prev) => [...prev, data.genre.id]);
       setNewGenreName("");
     } catch (err) {
       setError((err as Error).message);
-    } finally {
-      setLoading(false);
     }
   };
 
-  const handleAddAuthor = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!newAuthor.name.trim() || !newAuthor.date_of_birth || !newAuthor.country.trim()) {
-      return;
-    }
-
+  const handleDeleteBook = async (id: number) => {
     try {
-      setLoading(true);
       setError(null);
-      const res = await fetch("/author/create", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json"
-        },
-        body: JSON.stringify({
-          name: newAuthor.name.trim(),
-          date_of_birth: newAuthor.date_of_birth,
-          date_of_death: newAuthor.date_of_death || null,
-          country: newAuthor.country.trim()
-        })
-      });
-      if (!res.ok) {
-        throw new Error(`Failed to add author (${res.status})`);
-      }
-      const data = (await res.json()) as AuthorResponse;
-      setAuthors((prev) => [...prev, data.author]);
-      setNewAuthor({
-        name: "",
-        date_of_birth: "",
-        date_of_death: "",
-        country: ""
-      });
+      const res = await fetch(`/book/delete?book_id=${id}`, { method: "DELETE" });
+      if (!res.ok) throw new Error(`Failed to delete book (${res.status})`);
+      setBooks((prev) => prev.filter((b) => b.id !== id));
     } catch (err) {
       setError((err as Error).message);
-    } finally {
-      setLoading(false);
     }
   };
 
-  const handleAddBook = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (
-      !newBook.title.trim() ||
-      !newBook.isbn.trim() ||
-      !newBook.year ||
-      !newBook.author_id ||
-      !newBook.status_id
-    ) {
-      return;
+  const handleDeleteAuthor = async (id: number) => {
+    try {
+      setError(null);
+      const res = await fetch(`/author/delete?author_id=${id}`, { method: "DELETE" });
+      if (!res.ok) throw new Error(`Failed to delete author (${res.status})`);
+      setAuthors((prev) => prev.filter((a) => a.id !== id));
+      const booksRes = await fetch("/book/get/all");
+      if (booksRes.ok) {
+        const data = await booksRes.json();
+        setBooks(data.books);
+      }
+    } catch (err) {
+      setError((err as Error).message);
     }
+  };
+
+  const handleDeleteGenre = async (id: number) => {
+    try {
+      setError(null);
+      const res = await fetch(`/genre/delete?genre_id=${id}`, { method: "DELETE" });
+      if (!res.ok) throw new Error(`Failed to delete genre (${res.status})`);
+      setGenres((prev) => prev.filter((g) => g.id !== id));
+      setSelectedGenreIds((prev) => prev.filter((gid) => gid !== id));
+    } catch (err) {
+      setError((err as Error).message);
+    }
+  };
+
+  const canSubmit =
+    !loading &&
+    bookTitle.trim() &&
+    bookIsbn.trim() &&
+    bookYear &&
+    selectedStatusId &&
+    (authorMode === "existing"
+      ? !!selectedAuthorId
+      : newAuthorName.trim() && newAuthorDob && newAuthorCountry.trim());
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!canSubmit) return;
 
     try {
       setLoading(true);
       setError(null);
-      const res = await fetch("/book/create", {
+      setSuccess(null);
+
+      // Step 1: resolve author_id
+      let authorId: number;
+
+      if (authorMode === "existing") {
+        authorId = Number(selectedAuthorId);
+      } else {
+        const res = await fetch("/author/create", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            name: newAuthorName.trim(),
+            date_of_birth: newAuthorDob,
+            date_of_death: newAuthorDod || null,
+            country: newAuthorCountry.trim()
+          })
+        });
+        if (!res.ok) throw new Error(`Failed to create author (${res.status})`);
+        const data = await res.json();
+        authorId = data.author.id;
+        setAuthors((prev) => [...prev, data.author]);
+      }
+
+      // Step 2: create the book
+      const bookRes = await fetch("/book/create", {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json"
-        },
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          title: newBook.title.trim(),
-          isbn: newBook.isbn.trim(),
-          year: Number(newBook.year),
-          author_id: Number(newBook.author_id),
-          status_id: Number(newBook.status_id)
+          title: bookTitle.trim(),
+          isbn: bookIsbn.trim(),
+          year: Number(bookYear),
+          author_id: authorId,
+          status_id: Number(selectedStatusId)
         })
       });
-      if (!res.ok) {
-        throw new Error(`Failed to add book (${res.status})`);
-      }
-      const data = (await res.json()) as BookResponse;
-      setBooks((prev) => [...prev, data.book]);
-      setNewBook({
-        title: "",
-        isbn: "",
-        year: "",
-        author_id: "",
-        status_id: ""
-      });
+      if (!bookRes.ok) throw new Error(`Failed to create book (${bookRes.status})`);
+      const bookData = await bookRes.json();
+      setBooks((prev) => [...prev, bookData.book]);
+
+      // Reset form
+      setBookTitle("");
+      setBookIsbn("");
+      setBookYear("");
+      setAuthorMode("existing");
+      setSelectedAuthorId("");
+      setNewAuthorName("");
+      setNewAuthorDob("");
+      setNewAuthorDod("");
+      setNewAuthorCountry("");
+      setSelectedStatusId("");
+      setSelectedGenreIds([]);
+      setNewGenreName("");
+      setSuccess(`"${bookData.book.title}" added successfully!`);
     } catch (err) {
       setError((err as Error).message);
     } finally {
@@ -252,12 +306,12 @@ const App: React.FC = () => {
     >
       <div
         style={{
-          maxWidth: "720px",
+          maxWidth: "780px",
           margin: "0 auto",
           backgroundColor: "white",
           borderRadius: "1rem",
           boxShadow:
-            "0 10px 30px rgba(15, 23, 42, 0.08), 0 1px 2px rgba(15, 23, 42, 0.06)",
+            "0 10px 30px rgba(15,23,42,0.08), 0 1px 2px rgba(15,23,42,0.06)",
           padding: "2rem 2.5rem"
         }}
       >
@@ -273,826 +327,576 @@ const App: React.FC = () => {
             My Bookshelf
           </h1>
           <p style={{ color: "#6b7280", fontSize: "0.9rem" }}>
-            View and add genres, authors, and books in your database.
+            Add a book with its author, status, and genres -- all in one form.
           </p>
         </header>
 
-        {/* Books */}
-        <section
-          style={{
-            marginTop: "2rem",
-            paddingTop: "1.5rem",
-            borderTop: "1px solid #e5e7eb"
-          }}
-        >
-          <div
+        {error && (
+          <p
             style={{
-              display: "flex",
-              gap: "1.75rem",
-              flexWrap: "wrap",
-              alignItems: "flex-start"
+              fontSize: "0.85rem",
+              color: "#b91c1c",
+              marginBottom: "0.75rem",
+              padding: "0.5rem 0.75rem",
+              backgroundColor: "#fef2f2",
+              borderRadius: "0.5rem"
             }}
           >
-            <form
-              onSubmit={handleAddBook}
-              style={{
-                flex: "1 1 260px",
-                padding: "1.25rem 1.5rem",
-                borderRadius: "0.875rem",
-                border: "1px solid #e5e7eb",
-                backgroundColor: "#f9fafb"
-              }}
-            >
-              <h2
-                style={{
-                  fontSize: "1rem",
-                  fontWeight: 600,
-                  color: "#111827",
-                  marginBottom: "0.75rem"
-                }}
-              >
-                Add a new book
-              </h2>
+            {error}
+          </p>
+        )}
 
-              <label
-                htmlFor="bookTitle"
-                style={{
-                  display: "block",
-                  fontSize: "0.8rem",
-                  fontWeight: 500,
-                  color: "#6b7280",
-                  marginBottom: "0.35rem"
-                }}
-              >
+        {success && (
+          <p
+            style={{
+              fontSize: "0.85rem",
+              color: "#15803d",
+              marginBottom: "0.75rem",
+              padding: "0.5rem 0.75rem",
+              backgroundColor: "#f0fdf4",
+              borderRadius: "0.5rem"
+            }}
+          >
+            {success}
+          </p>
+        )}
+
+        {/* ── Unified "Add a book" form ── */}
+        <form onSubmit={handleSubmit} style={cardStyle}>
+          <h2
+            style={{
+              fontSize: "1.1rem",
+              fontWeight: 600,
+              color: "#111827",
+              marginBottom: "1rem"
+            }}
+          >
+            Add a new book
+          </h2>
+
+          {/* Book details */}
+          <div
+            style={{
+              display: "grid",
+              gridTemplateColumns: "1fr 1fr",
+              gap: "0 1rem"
+            }}
+          >
+            <div style={{ gridColumn: "1 / -1" }}>
+              <label htmlFor="title" style={labelStyle}>
                 Title
               </label>
               <input
-                id="bookTitle"
+                id="title"
                 type="text"
-                value={newBook.title}
-                onChange={(e) =>
-                  setNewBook((prev) => ({ ...prev, title: e.target.value }))
-                }
+                value={bookTitle}
+                onChange={(e) => setBookTitle(e.target.value)}
                 placeholder="e.g. A Wizard of Earthsea"
-                style={{
-                  width: "100%",
-                  padding: "0.6rem 0.75rem",
-                  borderRadius: "0.6rem",
-                  border: "1px solid #d1d5db",
-                  fontSize: "0.9rem",
-                  outline: "none",
-                  marginBottom: "0.75rem"
-                }}
+                style={inputStyle}
               />
+            </div>
 
-              <label
-                htmlFor="bookIsbn"
-                style={{
-                  display: "block",
-                  fontSize: "0.8rem",
-                  fontWeight: 500,
-                  color: "#6b7280",
-                  marginBottom: "0.35rem"
-                }}
-              >
+            <div>
+              <label htmlFor="isbn" style={labelStyle}>
                 ISBN
               </label>
               <input
-                id="bookIsbn"
+                id="isbn"
                 type="text"
-                value={newBook.isbn}
-                onChange={(e) =>
-                  setNewBook((prev) => ({ ...prev, isbn: e.target.value }))
-                }
-                style={{
-                  width: "100%",
-                  padding: "0.6rem 0.75rem",
-                  borderRadius: "0.6rem",
-                  border: "1px solid #d1d5db",
-                  fontSize: "0.9rem",
-                  outline: "none",
-                  marginBottom: "0.75rem"
-                }}
+                value={bookIsbn}
+                onChange={(e) => setBookIsbn(e.target.value)}
+                style={inputStyle}
               />
+            </div>
 
-              <label
-                htmlFor="bookYear"
-                style={{
-                  display: "block",
-                  fontSize: "0.8rem",
-                  fontWeight: 500,
-                  color: "#6b7280",
-                  marginBottom: "0.35rem"
-                }}
-              >
+            <div>
+              <label htmlFor="year" style={labelStyle}>
                 Year
               </label>
               <input
-                id="bookYear"
+                id="year"
                 type="number"
-                value={newBook.year}
-                onChange={(e) =>
-                  setNewBook((prev) => ({ ...prev, year: e.target.value }))
-                }
-                style={{
-                  width: "100%",
-                  padding: "0.6rem 0.75rem",
-                  borderRadius: "0.6rem",
-                  border: "1px solid #d1d5db",
-                  fontSize: "0.9rem",
-                  outline: "none",
-                  marginBottom: "0.75rem"
-                }}
+                value={bookYear}
+                onChange={(e) => setBookYear(e.target.value)}
+                style={inputStyle}
               />
+            </div>
+          </div>
 
-              <label
-                htmlFor="bookAuthorId"
-                style={{
-                  display: "block",
-                  fontSize: "0.8rem",
-                  fontWeight: 500,
-                  color: "#6b7280",
-                  marginBottom: "0.35rem"
-                }}
-              >
-                Author ID
-              </label>
-              <input
-                id="bookAuthorId"
-                type="number"
-                value={newBook.author_id}
-                onChange={(e) =>
-                  setNewBook((prev) => ({ ...prev, author_id: e.target.value }))
-                }
-                placeholder="Numeric author id"
-                style={{
-                  width: "100%",
-                  padding: "0.6rem 0.75rem",
-                  borderRadius: "0.6rem",
-                  border: "1px solid #d1d5db",
-                  fontSize: "0.9rem",
-                  outline: "none",
-                  marginBottom: "0.75rem"
-                }}
-              />
-
-              <label
-                htmlFor="bookStatusId"
-                style={{
-                  display: "block",
-                  fontSize: "0.8rem",
-                  fontWeight: 500,
-                  color: "#6b7280",
-                  marginBottom: "0.35rem"
-                }}
-              >
-                Status ID
-              </label>
-              <input
-                id="bookStatusId"
-                type="number"
-                value={newBook.status_id}
-                onChange={(e) =>
-                  setNewBook((prev) => ({ ...prev, status_id: e.target.value }))
-                }
-                placeholder="Numeric status id"
-                style={{
-                  width: "100%",
-                  padding: "0.6rem 0.75rem",
-                  borderRadius: "0.6rem",
-                  border: "1px solid #d1d5db",
-                  fontSize: "0.9rem",
-                  outline: "none",
-                  marginBottom: "0.75rem"
-                }}
-              />
-
-              <button
-                type="submit"
-                disabled={
-                  loading ||
-                  !newBook.title.trim() ||
-                  !newBook.isbn.trim() ||
-                  !newBook.year ||
-                  !newBook.author_id ||
-                  !newBook.status_id
-                }
-                style={{
-                  display: "inline-flex",
-                  alignItems: "center",
-                  justifyContent: "center",
-                  gap: "0.35rem",
-                  padding: "0.55rem 0.9rem",
-                  borderRadius: "999px",
-                  border: "none",
-                  fontSize: "0.85rem",
-                  fontWeight: 600,
-                  cursor:
-                    loading ||
-                    !newBook.title.trim() ||
-                    !newBook.isbn.trim() ||
-                    !newBook.year ||
-                    !newBook.author_id ||
-                    !newBook.status_id
-                      ? "not-allowed"
-                      : "pointer",
-                  background:
-                    loading ||
-                    !newBook.title.trim() ||
-                    !newBook.isbn.trim() ||
-                    !newBook.year ||
-                    !newBook.author_id ||
-                    !newBook.status_id
-                      ? "#e5e7eb"
-                      : "linear-gradient(135deg, #4f46e5, #6366f1)",
-                  color:
-                    loading ||
-                    !newBook.title.trim() ||
-                    !newBook.isbn.trim() ||
-                    !newBook.year ||
-                    !newBook.author_id ||
-                    !newBook.status_id
-                      ? "#9ca3af"
-                      : "white"
-                }}
-              >
-                <span>+ Add book</span>
-              </button>
-            </form>
+          {/* Author section */}
+          <fieldset
+            style={{
+              border: "1px solid #e5e7eb",
+              borderRadius: "0.75rem",
+              padding: "1rem 1.25rem",
+              marginBottom: "1rem"
+            }}
+          >
+            <legend
+              style={{
+                fontSize: "0.85rem",
+                fontWeight: 600,
+                color: "#374151",
+                padding: "0 0.35rem"
+              }}
+            >
+              Author
+            </legend>
 
             <div
               style={{
-                flex: "1.4 1 320px",
-                minHeight: "180px"
+                display: "flex",
+                gap: "0.5rem",
+                marginBottom: "0.75rem"
               }}
             >
+              <button
+                type="button"
+                onClick={() => setAuthorMode("existing")}
+                style={{
+                  padding: "0.35rem 0.75rem",
+                  borderRadius: "999px",
+                  border: "1px solid #d1d5db",
+                  fontSize: "0.8rem",
+                  cursor: "pointer",
+                  fontWeight: authorMode === "existing" ? 600 : 400,
+                  backgroundColor:
+                    authorMode === "existing" ? "#eef2ff" : "white",
+                  color: authorMode === "existing" ? "#4f46e5" : "#6b7280",
+                  borderColor:
+                    authorMode === "existing" ? "#6366f1" : "#d1d5db"
+                }}
+              >
+                Pick existing
+              </button>
+              <button
+                type="button"
+                onClick={() => setAuthorMode("new")}
+                style={{
+                  padding: "0.35rem 0.75rem",
+                  borderRadius: "999px",
+                  border: "1px solid #d1d5db",
+                  fontSize: "0.8rem",
+                  cursor: "pointer",
+                  fontWeight: authorMode === "new" ? 600 : 400,
+                  backgroundColor: authorMode === "new" ? "#eef2ff" : "white",
+                  color: authorMode === "new" ? "#4f46e5" : "#6b7280",
+                  borderColor: authorMode === "new" ? "#6366f1" : "#d1d5db"
+                }}
+              >
+                Create new
+              </button>
+            </div>
+
+            {authorMode === "existing" ? (
+              <div>
+                <label htmlFor="existingAuthor" style={labelStyle}>
+                  Select author
+                </label>
+                <select
+                  id="existingAuthor"
+                  value={selectedAuthorId}
+                  onChange={(e) => setSelectedAuthorId(e.target.value)}
+                  style={{ ...inputStyle, cursor: "pointer" }}
+                >
+                  <option value="">-- choose --</option>
+                  {authors.map((a) => (
+                    <option key={a.id} value={a.id}>
+                      {a.name} ({a.country})
+                    </option>
+                  ))}
+                </select>
+              </div>
+            ) : (
               <div
                 style={{
-                  display: "flex",
-                  justifyContent: "space-between",
-                  alignItems: "center",
-                  marginBottom: "0.75rem"
+                  display: "grid",
+                  gridTemplateColumns: "1fr 1fr",
+                  gap: "0 1rem"
                 }}
               >
-                <h2
-                  style={{
-                    fontSize: "1rem",
-                    fontWeight: 600,
-                    color: "#111827"
-                  }}
-                >
-                  Existing books
-                </h2>
-                <button
-                  type="button"
-                  onClick={fetchBooks}
-                  disabled={loading}
-                  style={{
-                    fontSize: "0.8rem",
-                    padding: "0.35rem 0.7rem",
-                    borderRadius: "999px",
-                    border: "1px solid #e5e7eb",
-                    backgroundColor: "white",
-                    cursor: loading ? "not-allowed" : "pointer",
-                    color: "#4b5563"
-                  }}
-                >
-                  Refresh
-                </button>
+                <div style={{ gridColumn: "1 / -1" }}>
+                  <label htmlFor="newAuthorName" style={labelStyle}>
+                    Name
+                  </label>
+                  <input
+                    id="newAuthorName"
+                    type="text"
+                    value={newAuthorName}
+                    onChange={(e) => setNewAuthorName(e.target.value)}
+                    placeholder="e.g. Ursula K. Le Guin"
+                    style={inputStyle}
+                  />
+                </div>
+                <div>
+                  <label htmlFor="newAuthorDob" style={labelStyle}>
+                    Date of birth
+                  </label>
+                  <input
+                    id="newAuthorDob"
+                    type="date"
+                    value={newAuthorDob}
+                    onChange={(e) => setNewAuthorDob(e.target.value)}
+                    style={inputStyle}
+                  />
+                </div>
+                <div>
+                  <label htmlFor="newAuthorDod" style={labelStyle}>
+                    Date of death (optional)
+                  </label>
+                  <input
+                    id="newAuthorDod"
+                    type="date"
+                    value={newAuthorDod}
+                    onChange={(e) => setNewAuthorDod(e.target.value)}
+                    style={inputStyle}
+                  />
+                </div>
+                <div style={{ gridColumn: "1 / -1" }}>
+                  <label htmlFor="newAuthorCountry" style={labelStyle}>
+                    Country
+                  </label>
+                  <input
+                    id="newAuthorCountry"
+                    type="text"
+                    value={newAuthorCountry}
+                    onChange={(e) => setNewAuthorCountry(e.target.value)}
+                    placeholder="e.g. United States"
+                    style={inputStyle}
+                  />
+                </div>
               </div>
+            )}
+          </fieldset>
 
-              {books.length === 0 && !loading ? (
-                <p
-                  style={{
-                    fontSize: "0.9rem",
-                    color: "#9ca3af",
-                    fontStyle: "italic"
-                  }}
-                >
-                  No books yet. Add your first one using the form on the left.
-                </p>
-              ) : (
-                <ul
-                  style={{
-                    listStyle: "none",
-                    padding: 0,
-                    margin: 0,
-                    display: "flex",
-                    flexDirection: "column",
-                    gap: "0.4rem"
-                  }}
-                >
-                  {books.map((book) => (
-                    <li
-                      key={book.id}
+          {/* Status */}
+          <div>
+            <label htmlFor="status" style={labelStyle}>
+              Status
+            </label>
+            <select
+              id="status"
+              value={selectedStatusId}
+              onChange={(e) => setSelectedStatusId(e.target.value)}
+              style={{ ...inputStyle, cursor: "pointer" }}
+            >
+              <option value="">-- choose --</option>
+              {statuses.map((s) => (
+                <option key={s.id} value={s.id}>
+                  {s.name}
+                </option>
+              ))}
+            </select>
+          </div>
+
+          {/* Genres (multi-select via toggleable pills) */}
+          <div style={{ marginBottom: "1rem" }}>
+            <span style={labelStyle}>Genres (click to toggle)</span>
+            {genres.length === 0 ? (
+              <p
+                style={{
+                  fontSize: "0.8rem",
+                  color: "#9ca3af",
+                  fontStyle: "italic"
+                }}
+              >
+                No genres available yet.
+              </p>
+            ) : (
+              <div style={{ display: "flex", flexWrap: "wrap", gap: "0.4rem" }}>
+                {genres.map((g) => {
+                  const selected = selectedGenreIds.includes(g.id);
+                  return (
+                    <button
+                      key={g.id}
+                      type="button"
+                      onClick={() => toggleGenre(g.id)}
                       style={{
-                        padding: "0.55rem 0.75rem",
-                        borderRadius: "0.75rem",
-                        backgroundColor: "#f9fafb",
-                        border: "1px solid #e5e7eb",
-                        fontSize: "0.85rem",
-                        color: "#111827"
+                        padding: "0.35rem 0.65rem",
+                        borderRadius: "999px",
+                        fontSize: "0.8rem",
+                        cursor: "pointer",
+                        border: selected
+                          ? "1px solid #6366f1"
+                          : "1px solid #d1d5db",
+                        backgroundColor: selected ? "#eef2ff" : "white",
+                        color: selected ? "#4f46e5" : "#374151",
+                        fontWeight: selected ? 600 : 400
                       }}
                     >
-                      <span style={{ fontWeight: 600 }}>{book.title}</span>
-                      <span style={{ color: "#6b7280", marginLeft: "0.35rem" }}>
-                        ({book.year}) · Author ID {book.author_id} · Status ID{" "}
-                        {book.status_id}
-                      </span>
-                    </li>
-                  ))}
-                </ul>
-              )}
-            </div>
-          </div>
-        </section>
-
-        {/* Authors */}
-        <section
-          style={{
-            marginTop: "2rem",
-            paddingTop: "1.5rem",
-            borderTop: "1px solid #e5e7eb"
-          }}
-        >
-          <div
-            style={{
-              display: "flex",
-              gap: "1.75rem",
-              flexWrap: "wrap",
-              alignItems: "flex-start"
-            }}
-          >
-            <form
-              onSubmit={handleAddAuthor}
-              style={{
-                flex: "1 1 260px",
-                padding: "1.25rem 1.5rem",
-                borderRadius: "0.875rem",
-                border: "1px solid #e5e7eb",
-                backgroundColor: "#f9fafb"
-              }}
-            >
-              <h2
-                style={{
-                  fontSize: "1rem",
-                  fontWeight: 600,
-                  color: "#111827",
-                  marginBottom: "0.75rem"
-                }}
-              >
-                Add a new author
-              </h2>
-
-              <label
-                htmlFor="authorName"
-                style={{
-                  display: "block",
-                  fontSize: "0.8rem",
-                  fontWeight: 500,
-                  color: "#6b7280",
-                  marginBottom: "0.35rem"
-                }}
-              >
-                Name
-              </label>
-              <input
-                id="authorName"
-                type="text"
-                value={newAuthor.name}
-                onChange={(e) =>
-                  setNewAuthor((prev) => ({ ...prev, name: e.target.value }))
-                }
-                placeholder="e.g. Ursula K. Le Guin"
-                style={{
-                  width: "100%",
-                  padding: "0.6rem 0.75rem",
-                  borderRadius: "0.6rem",
-                  border: "1px solid #d1d5db",
-                  fontSize: "0.9rem",
-                  outline: "none",
-                  marginBottom: "0.75rem"
-                }}
-              />
-
-              <label
-                htmlFor="authorDob"
-                style={{
-                  display: "block",
-                  fontSize: "0.8rem",
-                  fontWeight: 500,
-                  color: "#6b7280",
-                  marginBottom: "0.35rem"
-                }}
-              >
-                Date of birth
-              </label>
-              <input
-                id="authorDob"
-                type="date"
-                value={newAuthor.date_of_birth}
-                onChange={(e) =>
-                  setNewAuthor((prev) => ({
-                    ...prev,
-                    date_of_birth: e.target.value
-                  }))
-                }
-                style={{
-                  width: "100%",
-                  padding: "0.6rem 0.75rem",
-                  borderRadius: "0.6rem",
-                  border: "1px solid #d1d5db",
-                  fontSize: "0.9rem",
-                  outline: "none",
-                  marginBottom: "0.75rem"
-                }}
-              />
-
-              <label
-                htmlFor="authorDod"
-                style={{
-                  display: "block",
-                  fontSize: "0.8rem",
-                  fontWeight: 500,
-                  color: "#6b7280",
-                  marginBottom: "0.35rem"
-                }}
-              >
-                Date of death (optional)
-              </label>
-              <input
-                id="authorDod"
-                type="date"
-                value={newAuthor.date_of_death}
-                onChange={(e) =>
-                  setNewAuthor((prev) => ({
-                    ...prev,
-                    date_of_death: e.target.value
-                  }))
-                }
-                style={{
-                  width: "100%",
-                  padding: "0.6rem 0.75rem",
-                  borderRadius: "0.6rem",
-                  border: "1px solid #d1d5db",
-                  fontSize: "0.9rem",
-                  outline: "none",
-                  marginBottom: "0.75rem"
-                }}
-              />
-
-              <label
-                htmlFor="authorCountry"
-                style={{
-                  display: "block",
-                  fontSize: "0.8rem",
-                  fontWeight: 500,
-                  color: "#6b7280",
-                  marginBottom: "0.35rem"
-                }}
-              >
-                Country
-              </label>
-              <input
-                id="authorCountry"
-                type="text"
-                value={newAuthor.country}
-                onChange={(e) =>
-                  setNewAuthor((prev) => ({
-                    ...prev,
-                    country: e.target.value
-                  }))
-                }
-                placeholder="e.g. United States"
-                style={{
-                  width: "100%",
-                  padding: "0.6rem 0.75rem",
-                  borderRadius: "0.6rem",
-                  border: "1px solid #d1d5db",
-                  fontSize: "0.9rem",
-                  outline: "none",
-                  marginBottom: "0.75rem"
-                }}
-              />
-
-              <button
-                type="submit"
-                disabled={
-                  loading ||
-                  !newAuthor.name.trim() ||
-                  !newAuthor.date_of_birth ||
-                  !newAuthor.country.trim()
-                }
-                style={{
-                  display: "inline-flex",
-                  alignItems: "center",
-                  justifyContent: "center",
-                  gap: "0.35rem",
-                  padding: "0.55rem 0.9rem",
-                  borderRadius: "999px",
-                  border: "none",
-                  fontSize: "0.85rem",
-                  fontWeight: 600,
-                  cursor:
-                    loading ||
-                    !newAuthor.name.trim() ||
-                    !newAuthor.date_of_birth ||
-                    !newAuthor.country.trim()
-                      ? "not-allowed"
-                      : "pointer",
-                  background:
-                    loading ||
-                    !newAuthor.name.trim() ||
-                    !newAuthor.date_of_birth ||
-                    !newAuthor.country.trim()
-                      ? "#e5e7eb"
-                      : "linear-gradient(135deg, #4f46e5, #6366f1)",
-                  color:
-                    loading ||
-                    !newAuthor.name.trim() ||
-                    !newAuthor.date_of_birth ||
-                    !newAuthor.country.trim()
-                      ? "#9ca3af"
-                      : "white"
-                }}
-              >
-                <span>+ Add author</span>
-              </button>
-            </form>
-
+                      {g.name}
+                    </button>
+                  );
+                })}
+              </div>
+            )}
             <div
               style={{
-                flex: "1.4 1 320px",
-                minHeight: "180px"
+                display: "flex",
+                gap: "0.5rem",
+                marginTop: "0.5rem",
+                alignItems: "center"
               }}
             >
-              <div
-                style={{
-                  display: "flex",
-                  justifyContent: "space-between",
-                  alignItems: "center",
-                  marginBottom: "0.75rem"
-                }}
-              >
-                <h2
-                  style={{
-                    fontSize: "1rem",
-                    fontWeight: 600,
-                    color: "#111827"
-                  }}
-                >
-                  Existing authors
-                </h2>
-                <button
-                  type="button"
-                  onClick={fetchAuthors}
-                  disabled={loading}
-                  style={{
-                    fontSize: "0.8rem",
-                    padding: "0.35rem 0.7rem",
-                    borderRadius: "999px",
-                    border: "1px solid #e5e7eb",
-                    backgroundColor: "white",
-                    cursor: loading ? "not-allowed" : "pointer",
-                    color: "#4b5563"
-                  }}
-                >
-                  Refresh
-                </button>
-              </div>
-
-              {authors.length === 0 && !loading ? (
-                <p
-                  style={{
-                    fontSize: "0.9rem",
-                    color: "#9ca3af",
-                    fontStyle: "italic"
-                  }}
-                >
-                  No authors yet. Add your first one using the form on the left.
-                </p>
-              ) : (
-                <ul
-                  style={{
-                    listStyle: "none",
-                    padding: 0,
-                    margin: 0,
-                    display: "flex",
-                    flexDirection: "column",
-                    gap: "0.4rem"
-                  }}
-                >
-                  {authors.map((author) => (
-                    <li
-                      key={author.id}
-                      style={{
-                        padding: "0.55rem 0.75rem",
-                        borderRadius: "0.75rem",
-                        backgroundColor: "#f9fafb",
-                        border: "1px solid #e5e7eb",
-                        fontSize: "0.85rem",
-                        color: "#111827"
-                      }}
-                    >
-                      <span style={{ fontWeight: 600 }}>{author.name}</span>
-                      <span style={{ color: "#6b7280", marginLeft: "0.35rem" }}>
-                        ({author.country})
-                      </span>
-                    </li>
-                  ))}
-                </ul>
-              )}
-            </div>
-          </div>
-        </section>
-
-        {/* Genres */}
-        <section
-          style={{
-            marginTop: "2rem",
-            paddingTop: "1.5rem",
-            borderTop: "1px solid #e5e7eb"
-          }}
-        >
-          <div
-            style={{
-              display: "flex",
-              gap: "1.75rem",
-              flexWrap: "wrap",
-              alignItems: "flex-start"
-            }}
-          >
-            <form
-              onSubmit={handleAddGenre}
-              style={{
-                flex: "1 1 260px",
-                padding: "1.25rem 1.5rem",
-                borderRadius: "0.875rem",
-                border: "1px solid #e5e7eb",
-                backgroundColor: "#f9fafb"
-              }}
-            >
-              <h2
-                style={{
-                  fontSize: "1rem",
-                  fontWeight: 600,
-                  color: "#111827",
-                  marginBottom: "0.75rem"
-                }}
-              >
-                Add a new genre
-              </h2>
-              <label
-                htmlFor="genreName"
-                style={{
-                  display: "block",
-                  fontSize: "0.8rem",
-                  fontWeight: 500,
-                  color: "#6b7280",
-                  marginBottom: "0.35rem"
-                }}
-              >
-                Genre name
-              </label>
               <input
-                id="genreName"
                 type="text"
                 value={newGenreName}
                 onChange={(e) => setNewGenreName(e.target.value)}
-                placeholder="e.g. Fantasy"
+                placeholder="New genre name"
+                onKeyDown={(e) => {
+                  if (e.key === "Enter") {
+                    e.preventDefault();
+                    handleAddGenre();
+                  }
+                }}
                 style={{
-                  width: "100%",
-                  padding: "0.6rem 0.75rem",
-                  borderRadius: "0.6rem",
-                  border: "1px solid #d1d5db",
-                  fontSize: "0.9rem",
-                  outline: "none",
-                  marginBottom: "0.75rem",
-                  transition: "border-color 0.15s, box-shadow 0.15s"
-                }}
-                onFocus={(e) => {
-                  e.target.style.borderColor = "#6366f1";
-                  e.target.style.boxShadow =
-                    "0 0 0 1px rgba(79, 70, 229, 0.3)";
-                }}
-                onBlur={(e) => {
-                  e.target.style.borderColor = "#d1d5db";
-                  e.target.style.boxShadow = "none";
+                  ...inputStyle,
+                  marginBottom: 0,
+                  flex: 1
                 }}
               />
               <button
-                type="submit"
-                disabled={loading || !newGenreName.trim()}
+                type="button"
+                onClick={handleAddGenre}
+                disabled={!newGenreName.trim()}
                 style={{
-                  display: "inline-flex",
-                  alignItems: "center",
-                  justifyContent: "center",
-                  gap: "0.35rem",
-                  padding: "0.55rem 0.9rem",
-                  borderRadius: "999px",
-                  border: "none",
-                  fontSize: "0.85rem",
-                  fontWeight: 600,
-                  cursor: loading || !newGenreName.trim() ? "not-allowed" : "pointer",
-                  background:
-                    loading || !newGenreName.trim()
-                      ? "#e5e7eb"
-                      : "linear-gradient(135deg, #4f46e5, #6366f1)",
-                  color:
-                    loading || !newGenreName.trim() ? "#9ca3af" : "white",
-                  boxShadow:
-                    loading || !newGenreName.trim()
-                      ? "none"
-                      : "0 8px 18px rgba(79, 70, 229, 0.35)",
-                  transition:
-                    "transform 0.1s ease-out, box-shadow 0.1s ease-out, filter 0.1s"
+                  ...submitBtnStyle(!newGenreName.trim()),
+                  padding: "0.5rem 0.75rem",
+                  fontSize: "0.8rem",
+                  whiteSpace: "nowrap"
                 }}
               >
-                <span>+ Add genre</span>
+                + Add genre
               </button>
-            </form>
-
-            <div
-              style={{
-                flex: "1.4 1 320px",
-                minHeight: "180px"
-              }}
-            >
-              <div
-                style={{
-                  display: "flex",
-                  justifyContent: "space-between",
-                  alignItems: "center",
-                  marginBottom: "0.75rem"
-                }}
-              >
-                <h2
-                  style={{
-                    fontSize: "1rem",
-                    fontWeight: 600,
-                    color: "#111827"
-                  }}
-                >
-                  Existing genres
-                </h2>
-                <button
-                  type="button"
-                  onClick={fetchGenres}
-                  disabled={loading}
-                  style={{
-                    fontSize: "0.8rem",
-                    padding: "0.35rem 0.7rem",
-                    borderRadius: "999px",
-                    border: "1px solid #e5e7eb",
-                    backgroundColor: "white",
-                    cursor: loading ? "not-allowed" : "pointer",
-                    color: "#4b5563"
-                  }}
-                >
-                  Refresh
-                </button>
-              </div>
-
-              {genres.length === 0 && !loading ? (
-                <p
-                  style={{
-                    fontSize: "0.9rem",
-                    color: "#9ca3af",
-                    fontStyle: "italic"
-                  }}
-                >
-                  No genres yet. Add your first one using the form on the left.
-                </p>
-              ) : (
-                <ul
-                  style={{
-                    listStyle: "none",
-                    padding: 0,
-                    margin: 0,
-                    display: "grid",
-                    gridTemplateColumns: "repeat(auto-fill, minmax(140px, 1fr))",
-                    gap: "0.5rem"
-                  }}
-                >
-                  {genres.map((genre) => (
-                    <li
-                      key={genre.id}
-                      style={{
-                        padding: "0.55rem 0.75rem",
-                        borderRadius: "0.75rem",
-                        backgroundColor: "#f9fafb",
-                        border: "1px solid #e5e7eb",
-                        fontSize: "0.85rem",
-                        color: "#111827"
-                      }}
-                    >
-                      {genre.name}
-                    </li>
-                  ))}
-                </ul>
-              )}
             </div>
           </div>
+
+          <button type="submit" disabled={!canSubmit} style={submitBtnStyle(!canSubmit)}>
+            + Add book
+          </button>
+        </form>
+
+        {/* ── Existing books ── */}
+        <section style={{ marginTop: "2rem" }}>
+          <div
+            style={{
+              display: "flex",
+              justifyContent: "space-between",
+              alignItems: "center",
+              marginBottom: "0.75rem"
+            }}
+          >
+            <h2 style={{ fontSize: "1rem", fontWeight: 600, color: "#111827" }}>
+              Books
+            </h2>
+            <button
+              type="button"
+              onClick={fetchAll}
+              disabled={loading}
+              style={{
+                fontSize: "0.8rem",
+                padding: "0.35rem 0.7rem",
+                borderRadius: "999px",
+                border: "1px solid #e5e7eb",
+                backgroundColor: "white",
+                cursor: loading ? "not-allowed" : "pointer",
+                color: "#4b5563"
+              }}
+            >
+              Refresh
+            </button>
+          </div>
+
+          {loading && (
+            <p style={{ fontSize: "0.85rem", color: "#6b7280" }}>Loading...</p>
+          )}
+
+          {books.length === 0 && !loading ? (
+            <p
+              style={{
+                fontSize: "0.9rem",
+                color: "#9ca3af",
+                fontStyle: "italic"
+              }}
+            >
+              No books yet. Use the form above to add your first one.
+            </p>
+          ) : (
+            <ul
+              style={{
+                listStyle: "none",
+                padding: 0,
+                margin: 0,
+                display: "flex",
+                flexDirection: "column",
+                gap: "0.4rem"
+              }}
+            >
+              {books.map((book) => (
+                <li
+                  key={book.id}
+                  style={{
+                    ...pillStyle,
+                    display: "flex",
+                    justifyContent: "space-between",
+                    alignItems: "center"
+                  }}
+                >
+                  <div>
+                    <span style={{ fontWeight: 600 }}>{book.title}</span>
+                    <span style={{ color: "#6b7280", marginLeft: "0.35rem" }}>
+                      ({book.year}) · {authorName(book.author_id)} ·{" "}
+                      {statusName(book.status_id)}
+                    </span>
+                  </div>
+                  <button
+                    type="button"
+                    title="Delete book"
+                    onClick={() => handleDeleteBook(book.id)}
+                    onMouseEnter={(e) => (e.currentTarget.style.color = "#dc2626")}
+                    onMouseLeave={(e) => (e.currentTarget.style.color = "#9ca3af")}
+                    style={deleteBtnStyle}
+                  >
+                    &#128465;
+                  </button>
+                </li>
+              ))}
+            </ul>
+          )}
+        </section>
+
+        {/* ── Existing authors ── */}
+        <section
+          style={{
+            marginTop: "1.5rem",
+            paddingTop: "1.25rem",
+            borderTop: "1px solid #e5e7eb"
+          }}
+        >
+          <h2
+            style={{
+              fontSize: "1rem",
+              fontWeight: 600,
+              color: "#111827",
+              marginBottom: "0.75rem"
+            }}
+          >
+            Authors
+          </h2>
+          {authors.length === 0 ? (
+            <p
+              style={{
+                fontSize: "0.9rem",
+                color: "#9ca3af",
+                fontStyle: "italic"
+              }}
+            >
+              No authors yet.
+            </p>
+          ) : (
+            <ul
+              style={{
+                listStyle: "none",
+                padding: 0,
+                margin: 0,
+                display: "flex",
+                flexDirection: "column",
+                gap: "0.4rem"
+              }}
+            >
+              {authors.map((a) => (
+                <li
+                  key={a.id}
+                  style={{
+                    ...pillStyle,
+                    display: "flex",
+                    justifyContent: "space-between",
+                    alignItems: "center"
+                  }}
+                >
+                  <div>
+                    <span style={{ fontWeight: 600 }}>{a.name}</span>
+                    <span style={{ color: "#6b7280", marginLeft: "0.35rem" }}>
+                      ({a.country})
+                    </span>
+                  </div>
+                  <button
+                    type="button"
+                    title="Delete author"
+                    onClick={() => handleDeleteAuthor(a.id)}
+                    onMouseEnter={(e) => (e.currentTarget.style.color = "#dc2626")}
+                    onMouseLeave={(e) => (e.currentTarget.style.color = "#9ca3af")}
+                    style={deleteBtnStyle}
+                  >
+                    &#128465;
+                  </button>
+                </li>
+              ))}
+            </ul>
+          )}
+        </section>
+
+        {/* ── Existing genres ── */}
+        <section
+          style={{
+            marginTop: "1.5rem",
+            paddingTop: "1.25rem",
+            borderTop: "1px solid #e5e7eb"
+          }}
+        >
+          <h2
+            style={{
+              fontSize: "1rem",
+              fontWeight: 600,
+              color: "#111827",
+              marginBottom: "0.75rem"
+            }}
+          >
+            Genres
+          </h2>
+          {genres.length === 0 ? (
+            <p
+              style={{
+                fontSize: "0.9rem",
+                color: "#9ca3af",
+                fontStyle: "italic"
+              }}
+            >
+              No genres yet.
+            </p>
+          ) : (
+            <div
+              style={{
+                display: "flex",
+                flexWrap: "wrap",
+                gap: "0.4rem"
+              }}
+            >
+              {genres.map((g) => (
+                <span
+                  key={g.id}
+                  style={{
+                    ...pillStyle,
+                    display: "inline-flex",
+                    alignItems: "center",
+                    gap: "0.3rem"
+                  }}
+                >
+                  {g.name}
+                  <button
+                    type="button"
+                    title="Delete genre"
+                    onClick={() => handleDeleteGenre(g.id)}
+                    onMouseEnter={(e) => (e.currentTarget.style.color = "#dc2626")}
+                    onMouseLeave={(e) => (e.currentTarget.style.color = "#9ca3af")}
+                    style={deleteBtnStyle}
+                  >
+                    &#128465;
+                  </button>
+                </span>
+              ))}
+            </div>
+          )}
         </section>
       </div>
     </div>
@@ -1100,4 +904,3 @@ const App: React.FC = () => {
 };
 
 export default App;
-
