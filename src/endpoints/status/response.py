@@ -9,20 +9,27 @@ error_responses = {
     },
     404: {
         "description": "Not Found",
-        "content": {"application/json": {"example": {"detail": "Book not found. Check if the book exists."}}},
+        "content": {
+            "application/json": {
+                "example": {
+                    "detail": "Status not found. Check if the status exists."
+                }
+            }
+        },
     },
     422: {
         "description": "Unprocessable Entity",
         "content": {
             "application/json": {
-                "example": {"detail": "Invalid book data: field required"}
+                "example": {"detail": "Invalid status data: field required"}
             }
         },
     },
     500: {
         "description": "Internal Server Error",
         "content": {
-            "application/json": {"example": {"detail": "Error updating book in DB"}}
+            "application/json": {"example": {"detail": "Error updating status in DB"}}
         },
     },
 }
+

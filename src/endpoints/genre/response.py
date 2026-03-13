@@ -1,10 +1,4 @@
 error_responses = {
-    400: {
-        "description": "Bad Request",
-        "content": {
-            "application/json": {"example": {"detail": "Invalid book data"}}
-        },
-    },
     401: {
         "description": "Unauthorized",
         "content": {
@@ -15,20 +9,27 @@ error_responses = {
     },
     404: {
         "description": "Not Found",
-        "content": {"application/json": {"example": {"detail": "Book not found"}}},
+        "content": {
+            "application/json": {
+                "example": {
+                    "detail": "Genre not found. Check if the genre exists."
+                }
+            }
+        },
     },
     422: {
         "description": "Unprocessable Entity",
         "content": {
             "application/json": {
-                "example": {"detail": "Invalid book data: field required"}
+                "example": {"detail": "Invalid genre data: field required"}
             }
         },
     },
     500: {
         "description": "Internal Server Error",
         "content": {
-            "application/json": {"example": {"detail": "An unexpected error occurred"}}
+            "application/json": {"example": {"detail": "Error updating genre in DB"}}
         },
     },
 }
+
