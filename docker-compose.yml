@@ -46,6 +46,19 @@ services:
     ports:
       - "12345:12345"
 
+  tempo:
+    image: grafana/tempo:latest
+    command:
+      - -config.file=/etc/tempo/config.yaml
+    volumes:
+      - ./grafana/tempo.yaml:/etc/tempo/config.yaml:ro
+    ports:
+      - "3200:3200"
+    depends_on:
+      - alloy
+      - mimir
+      - loki
+
   mimir:
     image: grafana/mimir:latest
     command:
@@ -62,7 +75,11 @@ services:
       - "3100:3100"
 
   grafana:
-    image: grafana/grafana:latest
+    image: grafana/grafana-enterprise
+    network_mode: host
+    container_name: grafana
+    restart: unless-stopped
+    user: '0'
     environment:
       GF_AUTH_ANONYMOUS_ENABLED: "true"
       GF_AUTH_ANONYMOUS_ORG_ROLE: Admin
