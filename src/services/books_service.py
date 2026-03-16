@@ -21,7 +21,7 @@ logger = get_logger(__name__)
 
 def get_all_books_service(session: Session):
     with tracer.start_as_current_span("get_all_books_service"):
-        books = get_all_books()
+        books = get_all_books(session)
         logger.info(f"Books retrieved successfully: {len(books)}")
         if books is None:
             logger.error("No books found.")
@@ -33,7 +33,7 @@ def get_all_books_service(session: Session):
 
 def get_book_by_id_service(session: Session, book_id: int):
     with tracer.start_as_current_span("get_book_by_id_service", attributes={"book_id": book_id}):
-        book = get_book_by_id(book_id)
+        book = get_book_by_id(session, book_id)
         if book is None:
             logger.error(f"Book with ID {book_id} not found.")
             raise HTTPException(
@@ -46,7 +46,7 @@ def get_book_by_id_service(session: Session, book_id: int):
 
 def get_book_by_title_service(session: Session, book_title: str):
     with tracer.start_as_current_span("get_book_by_title_service", attributes={"book_title": book_title}):
-        book = get_book_by_title(book_title)
+        book = get_book_by_title(session, book_title)
         if book is None:
             logger.error(f"Book with title {book_title} not found.")
             raise HTTPException(
@@ -57,7 +57,7 @@ def get_book_by_title_service(session: Session, book_title: str):
 
 
 def add_book_service(session: Session, new_book: BookCreate):
-    with tracer.start_as_current_span("add_book_service", attributes={"new_book": new_book}):
+    with tracer.start_as_current_span("add_book_service"):
         if (
             new_book.title is None
             or new_book.isbn is None
@@ -68,12 +68,12 @@ def add_book_service(session: Session, new_book: BookCreate):
             logger.error("Missing required fields")
             raise HTTPException(status_code=400, detail="Missing required fields")
 
-        existing = get_book_by_title(new_book.title)
+        existing = get_book_by_title(session, new_book.title)
         if existing is not None:
             logger.error(f"Book {new_book.title} already exists.")
             raise HTTPException(status_code=400, detail="Book already exists.")
 
-        author = get_author_by_id(new_book.author_id)
+        author = get_author_by_id(session, new_book.author_id)
         if author is None:
             logger.error(f"Author {new_book.author_id} not found.")
             raise HTTPException(status_code=400, detail="Author not found.")
@@ -87,11 +87,11 @@ def add_book_service(session: Session, new_book: BookCreate):
         )
         logger.info(f"Book created successfully: {book}")
         get_books_created_counter().add(1)
-        return add_book_repo(book)
+        return add_book_repo(session, book)
 
 
 def update_book_service(session: Session, book_update: BookUpdate):
-    with tracer.start_as_current_span("update_book_service", attributes={"book_update": book_update}):
+    with tracer.start_as_current_span("update_book_service"):
         if book_update.id is not None:
             book = get_book_by_id(session, book_update.id)
         elif book_update.title is not None:
@@ -116,16 +116,16 @@ def update_book_service(session: Session, book_update: BookUpdate):
 
         logger.info(f"Book updated successfully: {book}")
         get_books_updated_counter().add(1)
-        return update_book(book)
+        return update_book(session, book)
 
 
 def delete_book_service(session: Session, book_id: int):
     with tracer.start_as_current_span("delete_book_service", attributes={"book_id": book_id}):
-        book = get_book_by_id(book_id)
+        book = get_book_by_id(session, book_id)
         if book is None:
             logger.error(f"Book with ID {book_id} not found.")
             raise HTTPException(status_code=404, detail="Book not found.")
         logger.info(f"Book deleted successfully: {book}")
         get_books_deleted_counter().add(1)
-        msg = delete_book(book_id)
+        msg = delete_book(session, book_id)
         return msg

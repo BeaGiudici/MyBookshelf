@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Depends
+from fastapi import APIRouter, Depends, Body
 from src.database.connection import get_session
 from sqlmodel import Session
 
@@ -12,7 +12,7 @@ router = APIRouter()
 
 
 @router.patch(path=path, response_model=GenreResponse, responses=error_responses, tags=tags)
-async def update_genre(session: Session = Depends(get_session), new_genre: GenreUpdate):
+async def update_genre(session: Session = Depends(get_session), new_genre: GenreUpdate = Body(...)):
     genre = update_genre_service(session, new_genre)
     return GenreResponse(genre=genre)
 

@@ -1,6 +1,4 @@
-from typing import List
 from src.database.models import Book
-from src.database.connection import get_session
 from sqlmodel import Session
 
 def get_all_books(session: Session):

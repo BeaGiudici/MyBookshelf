@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Depends
+from fastapi import APIRouter, Depends, Body
 from src.schemas.book_schemas import BookResponse, BookCreate
 from src.endpoints.book.response import error_responses
 from src.services.books_service import add_book_service
@@ -11,6 +11,6 @@ router = APIRouter()
 
 
 @router.post(path=path, response_model=BookResponse, responses=error_responses, tags=tags)
-async def add_book(session: Session = Depends(get_session), new_book: BookCreate):
+async def add_book(session: Session = Depends(get_session), new_book: BookCreate = Body(...)):
     book = add_book_service(session, new_book)
     return BookResponse(book=book)

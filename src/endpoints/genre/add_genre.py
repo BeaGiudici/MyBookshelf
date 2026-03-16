@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Depends
+from fastapi import APIRouter, Depends, Body
 from src.database.connection import get_session
 from sqlmodel import Session
 from src.endpoints.genre.response import error_responses
@@ -11,7 +11,7 @@ router = APIRouter()
 
 
 @router.post(path=path, response_model=GenreResponse, responses=error_responses, tags=tags)
-async def add_genre(session: Session = Depends(get_session), new_genre: GenreCreate):
+async def add_genre(session: Session = Depends(get_session), new_genre: GenreCreate = Body(...)):
     genre = add_genre_service(session, new_genre)
     return GenreResponse(genre=genre)
 

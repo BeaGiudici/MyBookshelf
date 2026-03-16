@@ -8,7 +8,7 @@ from src.repositories.authors_repo import (
 )
 from fastapi import HTTPException
 from src.database.models import Author
-from src.schemas.author_schemas import AuthorUpdate
+from src.schemas.author_schemas import AuthorUpdate, AuthorCreate
 from src.observability.metrics import get_authors_updated_counter, get_authors_retrieved_counter, get_authors_deleted_counter, get_authors_created_counter
 from src.observability.tracing import get_tracer
 from src.observability.logging import get_logger
@@ -49,7 +49,7 @@ def get_author_by_name_service(session: Session, author_name: str):
 
 def update_author_service(session: Session, new_author: AuthorUpdate):
     """Update an author entry in the database service"""
-    with tracer.start_as_current_span("update_author_service", attributes={"new_author": new_author}):
+    with tracer.start_as_current_span("update_author_service"):
         if new_author.id is not None:
             author = get_author_by_id(session, new_author.id)
         elif new_author.name is not None:
@@ -74,7 +74,7 @@ def update_author_service(session: Session, new_author: AuthorUpdate):
 
 def add_author_service(session: Session, new_author: AuthorCreate):
     """Add a new author entry to the database service"""
-    with tracer.start_as_current_span("add_author_service", attributes={"new_author": new_author}):
+    with tracer.start_as_current_span("add_author_service"):
         if (
             new_author.name is None
             or new_author.date_of_birth is None

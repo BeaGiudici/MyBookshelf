@@ -52,7 +52,7 @@ def get_genre_by_name_service(session: Session, genre_name: str):
 
 
 def add_genre_service(session: Session, new_genre: GenreCreate):
-    with tracer.start_as_current_span("add_genre_service", attributes={"new_genre": new_genre}):
+    with tracer.start_as_current_span("add_genre_service"):
         if new_genre.name is None:
             logger.error("Missing required fields")
             raise HTTPException(status_code=400, detail="Missing required fields")
@@ -69,7 +69,7 @@ def add_genre_service(session: Session, new_genre: GenreCreate):
 
 
 def update_genre_service(session: Session, genre_update: GenreUpdate):
-    with tracer.start_as_current_span("update_genre_service", attributes={"genre_update": genre_update}):
+    with tracer.start_as_current_span("update_genre_service"):
         if genre_update.id is not None:
             genre = get_genre_by_id(session, genre_update.id)
         elif genre_update.name is not None:

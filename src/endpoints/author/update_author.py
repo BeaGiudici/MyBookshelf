@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Depends
+from fastapi import APIRouter, Depends, Body
 from fastapi import HTTPException
 from src.schemas.author_schemas import AuthorResponse, AuthorUpdate
 from src.endpoints.author.response import error_responses
@@ -11,7 +11,7 @@ tags = ["author"]
 router = APIRouter()
 
 @router.patch(path=path, response_model=AuthorResponse, responses=error_responses, tags=tags)
-async def update_author(session: Session = Depends(get_session), new_author: AuthorUpdate):
+async def update_author(session: Session = Depends(get_session), new_author: AuthorUpdate = Body(...)):
     author = update_author_service(session, new_author)
 
     return AuthorResponse(author=author)

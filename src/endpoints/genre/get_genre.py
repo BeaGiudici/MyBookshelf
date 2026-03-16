@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Depends
+from fastapi import APIRouter, Depends, Body
 from src.database.connection import get_session
 from sqlmodel import Session
 
@@ -12,7 +12,7 @@ router = APIRouter()
 
 
 @router.get(path=path, response_model=GenreResponse, responses=error_responses, tags=tags)
-async def get_genre(session: Session = Depends(get_session), genre_id: int):
+async def get_genre(session: Session = Depends(get_session), genre_id: int = Body(...)):
     genre = get_genre_by_id_service(session, genre_id)
     return GenreResponse(genre=genre)
 
