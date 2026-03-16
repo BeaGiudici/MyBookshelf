@@ -24,3 +24,13 @@ def instrument_sqlalchemy(engine) -> None:
 
 def get_tracer(name: str) -> trace.Tracer:
     return trace.get_tracer(name)
+
+def trace_context() -> dict:
+    span = trace.get_current_span()
+    ctx = span.get_span_context()
+    if not ctx.is_valid:
+        return {"trace_id": None, "span_id": None}
+    return {
+        "trace_id": format(ctx.trace_id, "032x"),
+        "span_id": format(ctx.span_id, "016x"),
+    }

@@ -16,6 +16,7 @@ _books_created_counter: metrics.Counter | None = None
 _books_deleted_counter: metrics.Counter | None = None
 _books_updated_counter: metrics.Counter | None = None
 _books_retrieved_counter: metrics.Counter | None = None
+_authors_created_counter: metrics.Counter | None = None
 _authors_deleted_counter: metrics.Counter | None = None
 _authors_retrieved_counter: metrics.Counter | None = None
 _authors_updated_counter: metrics.Counter | None = None
@@ -35,20 +36,8 @@ def setup_metrics(resource: Resource, otlp_endpoint: str) -> None:
 
 
 def _register_instruments() -> None:
-    global (
-        _books_created_counter,
-        _books_deleted_counter,
-        _books_updated_counter,
-        _books_retrieved_counter,
-        _authors_created_counter,
-        _authors_deleted_counter,
-        _authors_updated_counter,
-        _authors_retrieved_counter,
-        _genres_created_counter,
-        _genres_deleted_counter,
-        _genres_updated_counter,
-        _genres_retrieved_counter,
-    )
+    global _books_created_counter, _books_deleted_counter, _books_updated_counter, _books_retrieved_counter, _authors_created_counter, _authors_deleted_counter, _authors_updated_counter, _authors_retrieved_counter, _genres_created_counter, _genres_deleted_counter, _genres_updated_counter, _genres_retrieved_counter
+
     assert _meter is not None
 
     _books_created_counter = _meter.create_counter(

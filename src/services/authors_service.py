@@ -38,7 +38,7 @@ def get_author_by_id_service(author_id: int):
 
 def get_author_by_name_service(author_name: str):
     with tracer.start_as_current_span("get_author_by_name_service", attributes={"author_name": author_name}):   
-    author = get_author_by_name(author_name)
+        author = get_author_by_name(author_name)
         if author is None:
             logger.error(f"Author with name {author_name} not found.")
             raise HTTPException(status_code=404, detail=f"Author with name {author_name} not found.")

@@ -21,4 +21,4 @@ def setup_observability() -> None:
 
     setup_metrics(resource, endpoint)
     setup_tracing(resource, endpoint)
-    setup_logging(log_level)
+    setup_logging()

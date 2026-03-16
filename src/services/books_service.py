@@ -21,10 +21,11 @@ logger = get_logger(__name__)
 def get_all_books_service():
     with tracer.start_as_current_span("get_all_books_service"):
         books = get_all_books()
+        logger.info(f"Books retrieved successfully: {len(books)}")
         if books is None:
             logger.error("No books found.")
             raise HTTPException(status_code=404, detail="No books found.")
-        logger.info(f"Books retrieved successfully: {books}")
+        logger.info(f"Books retrieved successfully: {len(books)}")
         get_books_retrieved_counter().add(len(books))
         return books
 

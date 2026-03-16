@@ -11,3 +11,6 @@ def setup_logging() -> None:
     
     logger.add(str(Path(log_dir) / "app.log"), serialize=True, level="INFO", rotation="10 MB", retention="7 days", compression="gz")
     logger.add(sys.stdout, serialize=True, level="INFO")
+
+def get_logger(name: str) -> logger:
+    return logger.bind(name=name)
