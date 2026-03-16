@@ -1,4 +1,6 @@
-from fastapi import APIRouter
+from fastapi import APIRouter, Depends
+from src.database.connection import get_session
+from sqlmodel import Session
 
 from src.endpoints.genre.response import error_responses
 from src.schemas.genre_schemas import GenresResponse
@@ -10,7 +12,7 @@ router = APIRouter()
 
 
 @router.get(path=path, response_model=GenresResponse, responses=error_responses, tags=tags)
-async def get_genres():
-    genres = get_all_genres_service()
+async def get_genres(session: Session = Depends(get_session)):
+    genres = get_all_genres_service(session)
     return GenresResponse(genres=genres)
 
