@@ -19,5 +19,6 @@ dependencies = [
     "opentelemetry-instrumentation-fastapi",
     "opentelemetry-instrumentation-sqlalchemy",
     "opentelemetry-instrumentation-logging",
-    "structlog",
+    "loguru",
+    "prometheus-fastapi-instrumentator",
 ]
