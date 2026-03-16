@@ -1,0 +1,62 @@
+// ============================================
+// METRICS: Scrape from API and send to Mimir
+// ============================================
+
+// Scrape metrics from the API
+prometheus.scrape "api" {
+  targets = [
+    {"__address__" = "api:8000", "job" = "api"},
+  ]
+  metrics_path = "/metrics"
+  scrape_interval = "15s"
+  forward_to = [prometheus.remote_write.mimir.receiver]
+}
+
+// Send metrics to Mimir
+prometheus.remote_write "mimir" {
+  endpoint {
+    url = "http://mimir:9009/api/v1/push"
+  }
+}
+
+// ============================================
+// LOGS: Collect from files and send to Loki
+// ============================================
+
+local.file_match "app_logs" {
+    path_targets = [{"__path__" = "/var/log/app.log"}]
+}
+
+loki.source.file "app" {
+    targets = local.file_match.app_logs.targets
+    forward_to = [loki.process.app.receiver]
+}
+
+loki.process "app" {
+    forward_to = [loki.write.loki.receiver]
+    stage.json {
+        expressions = {
+            level = "record.level.name",
+            message = "record.message",
+            service = "record.extra.service",
+            endpoint = "record.extra.endpoint",
+            method = "record.extra.method",
+            status = "record.extra.status_code",
+            latency = "record.extra.latency_ms",
+            trace_id = "record.extra.trace_id",
+        }
+    }
+    stage.labels {
+        values = {
+            level = "",
+            service = "",
+            method = "",
+        }
+    }
+}
+
+loki.write "loki" {
+    endpoint {
+        url = "http://loki:3100/loki/api/v1/push"
+    }
+}

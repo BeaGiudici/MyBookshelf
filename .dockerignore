@@ -2,3 +2,12 @@
 .venv
 bookshelf.db
 __pycache__/
+frontend/
+var/
+grafana/
+.git/
+.gitignore
+.ruff_cache/
+*.md
+Justfile
+.cursor/
