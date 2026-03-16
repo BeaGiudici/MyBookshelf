@@ -5,6 +5,7 @@ import os
 import psycopg2
 from dotenv import load_dotenv
 from sqlmodel import Session, create_engine
+from collections.abc import Generator
 
 load_dotenv()
 
@@ -40,8 +41,12 @@ def close_connection() -> None:
         _connection = None
 
 
-def get_session() -> Session:
-    """Get a SQLModel session backed by a SQLAlchemy engine."""
+def get_session() -> Generator[Session, None, None]:
+    """Yield one session per request; close it when the request ends."""
     if _engine is None:
         raise RuntimeError("DB_URL is not set; cannot create SQLModel engine/session.")
-    return Session(_engine)
+    session = Session(_engine)
+    try:
+        yield session
+    finally:
+        session.close()
