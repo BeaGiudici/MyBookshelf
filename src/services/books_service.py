@@ -7,6 +7,7 @@ from src.repositories.books_repo import (
     delete_book,
 )
 from src.repositories.authors_repo import get_author_by_id
+from sqlmodel import Session
 from src.database.models import Book
 from src.schemas.book_schemas import BookCreate, BookUpdate
 from fastapi import HTTPException
@@ -18,7 +19,7 @@ tracer = get_tracer(__name__)
 logger = get_logger(__name__)
 
 
-def get_all_books_service():
+def get_all_books_service(session: Session):
     with tracer.start_as_current_span("get_all_books_service"):
         books = get_all_books()
         logger.info(f"Books retrieved successfully: {len(books)}")
@@ -30,7 +31,7 @@ def get_all_books_service():
         return books
 
 
-def get_book_by_id_service(book_id: int):
+def get_book_by_id_service(session: Session, book_id: int):
     with tracer.start_as_current_span("get_book_by_id_service", attributes={"book_id": book_id}):
         book = get_book_by_id(book_id)
         if book is None:
@@ -43,7 +44,7 @@ def get_book_by_id_service(book_id: int):
         return book
 
 
-def get_book_by_title_service(book_title: str):
+def get_book_by_title_service(session: Session, book_title: str):
     with tracer.start_as_current_span("get_book_by_title_service", attributes={"book_title": book_title}):
         book = get_book_by_title(book_title)
         if book is None:
@@ -55,7 +56,7 @@ def get_book_by_title_service(book_title: str):
         return book
 
 
-def add_book_service(new_book: BookCreate):
+def add_book_service(session: Session, new_book: BookCreate):
     with tracer.start_as_current_span("add_book_service", attributes={"new_book": new_book}):
         if (
             new_book.title is None
@@ -89,12 +90,12 @@ def add_book_service(new_book: BookCreate):
         return add_book_repo(book)
 
 
-def update_book_service(book_update: BookUpdate):
+def update_book_service(session: Session, book_update: BookUpdate):
     with tracer.start_as_current_span("update_book_service", attributes={"book_update": book_update}):
         if book_update.id is not None:
-            book = get_book_by_id_service(book_update.id)
+            book = get_book_by_id(session, book_update.id)
         elif book_update.title is not None:
-            book = get_book_by_title_service(book_update.title)
+            book = get_book_by_title(session, book_update.title)
         else:
             logger.error("Missing required fields. Provide either ID or title.")
             raise HTTPException(
@@ -118,7 +119,7 @@ def update_book_service(book_update: BookUpdate):
         return update_book(book)
 
 
-def delete_book_service(book_id: int):
+def delete_book_service(session: Session, book_id: int):
     with tracer.start_as_current_span("delete_book_service", attributes={"book_id": book_id}):
         book = get_book_by_id(book_id)
         if book is None:
