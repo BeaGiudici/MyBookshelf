@@ -3,6 +3,15 @@ multitenancy_enabled: false
 server:
   http_listen_port: 9009
 
+ingester:
+  ring:
+    zone_awareness_enabled: false
+    replication_factor: 1
+store_gateway:
+  sharding_ring:
+    zone_awareness_enabled: false
+    replication_factor: 1
+
 blocks_storage:
   backend: filesystem
   filesystem:
