@@ -9,7 +9,7 @@ def setup_logging() -> None:
     log_dir = os.getenv("LOG_DIR", "var/logs")
     Path(log_dir).mkdir(parents=True, exist_ok=True)
     
-    logger.add(str(Path(log_dir) / "app.log"), serialize=True, level="INFO", rotation="10 MB", retention="7 days", compression="gz")
+    logger.add(str(Path(log_dir) / "app.log"), serialize=True, level="INFO", rotation="00:00", compression="gz")
     logger.add(sys.stdout, serialize=True, level="INFO")
 
 def get_logger(name: str) -> logger:
