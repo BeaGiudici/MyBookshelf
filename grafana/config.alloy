@@ -20,6 +20,28 @@ prometheus.remote_write "mimir" {
 }
 
 // ============================================
+// TRACES: Receive OTLP and send to Tempo
+// ============================================
+
+otelcol.receiver.otlp "default" {
+    grpc {
+        endpoint = "0.0.0.0:4317"
+    }
+    output {
+        traces = [otelcol.exporter.otlp.tempo.input]
+    }
+}
+
+otelcol.exporter.otlp "tempo" {
+    client {
+        endpoint = "tempo:4317"
+        tls {
+            insecure = true
+        }
+    }
+}
+
+// ============================================
 // LOGS: Collect from files and send to Loki
 // ============================================
 
